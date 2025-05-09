@@ -1,43 +1,47 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}The Social Card{% endblock %}</title>
 
   <!-- Desktop-CSS -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- Mobil-CSS (≤600px) -->
-  <link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/mobile.css') }}"
-    media="only screen and (max-width: 600px)"
-  >
+  <!-- Mobil-CSS (innehåller egna @media‐regler) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}" />
 </head>
 <body class="{% if request.endpoint == 'public.public_profile' and user is defined %}{{ user.template }}{% endif %}">
 
   <nav class="navbar">
     <div class="nav-container">
-      <!-- Hamburger (syns bara på mobil) -->
+      <!-- 1) Hamburger-knapp (endast synlig på ≤600px) -->
       <button class="hamburger" aria-label="Öppna meny">☰</button>
 
-      <!-- Logotyp -->
+      <!-- 2) Logotyp / Titel -->
       <div class="nav-logo">TheSocialCard</div>
 
-      <!-- Menylänkar -->
-      <ul class="nav-links">
-        {% if current_user.is_authenticated %}
-          <li><a href="{{ url_for('dashboard.dashboard_view') }}">Dashboard</a></li>
-          <li><a href="{{ url_for('dashboard.profile') }}">Min Profil</a></li>
-          <li><a href="{{ url_for('auth.logout') }}">Logga ut</a></li>
-        {% else %}
-          <li><a href="{{ url_for('auth.register') }}">Logga in</a></li>
-          <li><a href="{{ url_for('auth.register') }}">Registrera</a></li>
-        {% endif %}
-      </ul>
+      <!-- 3) Menylänkar (desktop‐vy) -->
+        <ul class="nav-links">
+          {% if current_user.is_authenticated %}
+            <li><a class="btn-secondary" href="{{ url_for('dashboard.dashboard_view') }}">Dashboard</a></li>
+            <li><a class="btn-secondary" href="{{ url_for('themes.themes_view') }}">Teman</a></li>
+                <li>
+                  <a class="btn-secondary"
+                     href="{{ url_for('public.public_profile', username=current_user.username) }}"
+                     target="_blank"
+                     rel="noopener noreferrer">
+                    Offentlig profil
+                  </a>
+                </li>
+            <li><a class="btn-secondary" href="{{ url_for('auth.logout') }}">Logga ut</a></li>
+          {% else %}
+            <li><a class="btn-secondary" href="{{ url_for('auth.login') }}">Logga in</a></li>
+            <li><a class="btn-secondary" href="{{ url_for('auth.register') }}">Registrera</a></li>
+          {% endif %}
+        </ul>
     </div>
   </nav>
 
@@ -52,63 +56,44 @@
     {% block content %}{% endblock %}
   </div>
 
-  <!-- Ta bort flash-meddelanden -->
-  <script>
-    setTimeout(() => {
-      document.querySelectorAll('.flash').forEach(el => el.remove());
-    }, 4000);
-  </script>
-
-  <!-- Hamburger-toggle + slider‐centrering -->
+  <!-- All JS samlat i en skötar alla handlers -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 1) Hamburger‐meny
-      const btn = document.querySelector('.hamburger');
-      const links = document.querySelector('.nav-links');
-      btn?.addEventListener('click', () => links.classList.toggle('open'));
+      // 1) Ta bort flash‐meddelanden efter 4 sekunder
+      setTimeout(() => {
+        document.querySelectorAll('.flash').forEach(el => el.remove());
+      }, 4000);
 
-      // 2) Funktion för att rotera slidern så aktivt kort hamnar mitt
+      // 2) Toggle för hamburgermeny
+      const btn = document.querySelector('.hamburger');
+      const menu = document.querySelector('.nav-links');
+      if (btn && menu) {
+        btn.addEventListener('click', () => {
+          menu.classList.toggle('open');
+        });
+      }
+
+      // 3) Slider‐centrering (om du använder template-slider)
       function centerSliderOn(card) {
         const slider = document.querySelector('.template-slider');
         if (!slider || !card) return;
-
-        // Hämta alla kort
         const cards = Array.from(slider.children);
-        const count = cards.length;
-        const centerIndex = Math.floor(count / 2);
-        const currentIndex = cards.indexOf(card);
-        let shift = currentIndex - centerIndex;
-
-        // Flytta element framåt eller bakåt
+        const centerIndex = Math.floor(cards.length / 2);
+        const idx = cards.indexOf(card);
+        let shift = idx - centerIndex;
         if (shift > 0) {
-          for (let i = 0; i < shift; i++) {
-            slider.appendChild(cards.shift());
-          }
+          for (let i = 0; i < shift; i++) slider.appendChild(cards.shift());
         } else if (shift < 0) {
-          for (let i = 0; i < -shift; i++) {
-            slider.insertBefore(cards.pop(), slider.firstChild);
-          }
+          for (let i = 0; i < -shift; i++) slider.insertBefore(cards.pop(), slider.firstChild);
         }
-
-        // Scrolla mitt‐kortet i view
-        const newCards = Array.from(slider.children);
-        const middle = newCards[centerIndex];
-        middle.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        Array.from(slider.children)[centerIndex].scrollIntoView({ behavior: 'smooth', inline: 'center' });
       }
-
-      // 3) På sidladdning: hitta aktivt kort
-      let activeCard =
-        document.querySelector('.template-slider input:checked')?.closest('.template-card')
-        || document.querySelector('.template-card.active');
-      centerSliderOn(activeCard);
-
-      // 4) När du byter mall: scrolla det nya in i mitten
-      document.querySelectorAll('.template-slider input[name="template"]').forEach(inp => {
-        inp.addEventListener('change', () => {
-          const card = inp.closest('.template-card');
-          centerSliderOn(card);
-        });
-      });
+      let active = document.querySelector('.template-slider input:checked')?.closest('.template-card')
+                || document.querySelector('.template-card.active');
+      centerSliderOn(active);
+      document.querySelectorAll('.template-slider input[name="template"]').forEach(i =>
+        i.addEventListener('change', () => centerSliderOn(i.closest('.template-card')))
+      );
     });
   </script>
 </body>
