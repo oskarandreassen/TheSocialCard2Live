@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}@{{ user.username }}{% endblock %}
+
+{% block content %}
+<style>
+/* Dölj navbar på publika profilsidan */
+.navbar {
+    display: none;
+}
+
+/* Hela sidan är themed */
+body {
+    background: inherit;
+    margin: 0;
+    padding: 0;
+    font-family: {{ user.font_family | default('Inter, sans-serif') }};
+}
+
+/* Centrera innehållet vertikalt och horisontellt */
+.public-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 16px 100px;
+    box-sizing: border-box;
+}
+
+/* Kortet med profil + länkar */
+.public-profile {
+    max-width: 400px;
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border-radius: 24px;
+    padding: 24px 20px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    text-align: center;
+    color: {{ user.theme_color or '#fff' }};
+    box-sizing: border-box;
+}
+
+/* Bild och text */
+.public-profile .profile-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 12px;
+}
+.public-profile h2 {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 700;
+}
+.public-profile p {
+    font-size: 1rem;
+    margin: 8px 0 20px;
+}
+
+/* Länkar */
+.public-profile .links {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.public-profile .link-button {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: background 0.2s, transform 0.2s;
+    box-sizing: border-box;
+}
+.public-profile .link-button:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+}
+
+/* Fast knapp längst ned */
+.footer-cta {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 20px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.2);
+    text-decoration: none;
+}
+.footer-cta:hover {
+    background: rgba(255,255,255,0.2);
+}
+</style>
+
+<div class="public-page-wrapper {{ user.template }}">
+    <div class="public-profile {{ user.template }}">
+        <img src="{{ url_for('static', filename=user.profile_image or 'default-profile.png') }}" class="profile-img">
+        <h2>@{{ user.username }}</h2>
+        <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
+
+        {% set visible_links = links | selectattr('is_visible') | list %}
+        {% if visible_links %}
+            <div class="links">
+                {% for link in visible_links %}
+                    {% set icon = "" %}
+                    {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+                    {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
+                    {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
+                    {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
+                    {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
+                    {% endif %}
+                    <a class="link-button {{ user.template }}" href="{{ link.url }}" target="_blank">
+                        {% if icon %}<i class="{{ icon }}"></i>{% endif %} {{ link.label }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p><em>Användaren har valt att dölja sina länkar.</em></p>
+        {% endif %}
+    </div>
+</div>
+
+<a href="/" class="footer-cta">🌟 Gå till startsidan</a>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+
+    <!-- 📂 SIDOPANEL TILL VÄNSTER -->
+    <div class="dashboard-sidebar">
+        <a href="{{ url_for('themes.themes_view') }}" class="btn action-btn sidebar-btn">🎨 Teman</a>
+        <a href="{{ url_for('public.public_profile', username=user.username) }}" class="btn action-btn sidebar-btn">🌐 Visa profil</a>
+    </div>
+
+    <!-- 🎛️ DASHBOARD PANEL I MITTEN -->
+    <div class="dashboard-panel">
+        <h2>Välkommen, {{ user.username }}!</h2>
+
+        <div class="profile-card">
+            <img src="{{ url_for('static', filename=user.profile_image or 'default-profile.png') }}" class="profile-img">
+            <h3>@{{ user.username }}</h3>
+            <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
+        </div>
+
+        <button id="openModal" class="btn action-btn">➕ Lägg till</button>
+
+        <div id="addModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close" id="closeModal">&times;</span>
+                <h3>Lägg till länk</h3>
+                <form method="POST">
+                    <input name="label" placeholder="Titel (t.ex. LinkedIn)" required>
+                    <input name="url" placeholder="https://dinsida.com" required>
+                    <button type="submit">Spara</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="link-list" class="links">
+            {% for link in sorted_links %}
+                {% set icon = "" %}
+                {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+                {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
+                {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
+                {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
+                {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
+                {% endif %}
+
+                <div class="link-card" data-id="{{ link.id }}" data-label="{{ link.label }}" data-url="{{ link.url }}" data-icon="{{ icon }}" data-visible="{{ link.is_visible }}">
+                    <form class="edit-link-form" style="display: none;">
+                        <input type="text" name="label" value="{{ link.label }}" required>
+                        <input type="url" name="url" value="{{ link.url }}" required>
+                        <button type="submit">📂</button>
+                    </form>
+
+                    <div class="link-main">
+                        <div class="link-info">
+                            {% if icon %}<i class="{{ icon }}"></i>{% endif %}
+                            <span class="link-label">{{ link.label }}</span>
+                        </div>
+
+                        <div class="link-actions">
+                            <form method="POST" action="{{ url_for('dashboard.toggle_link_visibility', link_id=link.id) }}">
+                                <button type="submit" class="link-btn" title="Visa/dölj länk">
+                                    {% if link.is_visible %}👁️{% else %}❌{% endif %}
+                                </button>
+                            </form>
+                            <a href="#" class="link-btn edit-btn" title="Redigera">✏️</a>
+                            <a href="{{ url_for('dashboard.delete_link', link_id=link.id) }}" class="link-btn" title="Radera">🗑️</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 📱 FÖRHANDSVISNING TILL HÖGER -->
+    <div class="preview-panel">
+        <div class="mobile-preview {{ user.template }}" style="font-family: {{ user.font_family | default('Inter, sans-serif') }}; color: {{ user.theme_color or '#fff' }};">
+            <div class="profile-card {{ user.template }}" style="font-family: inherit; color: inherit;">
+                <img src="{{ url_for('static', filename=user.profile_image or 'default-profile.png') }}" class="profile-img">
+                <h3>@{{ user.username }}</h3>
+                <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
+                <div class="links" id="preview-links">
+                    {% for link in sorted_links if link.is_visible %}
+                        {% set icon = "" %}
+                        {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+                        {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
+                        {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
+                        {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
+                        {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
+                        {% endif %}
+                        <a class="link-button {{ user.template }}" href="#" onclick="return false;">
+                            {% if icon %}<i class="{{ icon }}"></i>{% endif %} {{ link.label }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.sidebar-btn {
+    background-color: #ffffff !important;
+    color: #333 !important;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 10px 20px;
+    transition: all 0.2s ease-in-out;
+}
+.sidebar-btn:hover {
+    transform: scale(1.04);
+    background-color: #f8f8f8;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    const el = document.getElementById('link-list');
+    const previewLinks = document.getElementById('preview-links');
+
+    new Sortable(el, {
+        animation: 150,
+        onEnd: () => {
+            const order = [...el.children].map(row => row.dataset.id);
+            fetch('/update_order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order: order })
+            }).then(() => {
+                const reordered = [...el.children].filter(row => row.dataset.visible === 'True');
+                previewLinks.innerHTML = '';
+                reordered.forEach(row => {
+                    const label = row.dataset.label;
+                    const icon = row.dataset.icon;
+                    const template = '{{ user.template }}';
+
+                    const link = document.createElement('a');
+                    link.className = `link-button ${template}`;
+                    link.href = "#";
+                    link.onclick = () => false;
+                    if (icon) link.innerHTML = `<i class="${icon}"></i> ${label}`;
+                    else link.innerText = label;
+                    previewLinks.appendChild(link);
+                });
+            });
+        }
+    });
+
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            const row = btn.closest('.link-card');
+            row.querySelector('.edit-link-form').style.display = 'flex';
+            row.querySelector('.link-main').style.display = 'none';
+        });
+    });
+
+    document.querySelectorAll('.edit-link-form').forEach(form => {
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const row = form.closest('.link-card');
+            const id = row.dataset.id;
+            const label = form.label.value;
+            const url = form.url.value;
+
+            fetch(`/edit_link_inline/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ label, url })
+            }).then(() => location.reload());
+        });
+    });
+
+    const modal = document.getElementById("addModal");
+    const openBtn = document.getElementById("openModal");
+    const closeBtn = document.getElementById("closeModal");
+
+    openBtn.onclick = () => modal.style.display = "flex";
+    closeBtn.onclick = () => modal.style.display = "none";
+    window.onclick = e => { if (e.target == modal) modal.style.display = "none"; };
+</script>
+{% endblock %}

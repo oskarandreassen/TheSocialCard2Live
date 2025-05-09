@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Min Profil{% endblock %}
+{% block content %}
+<div class="profile-card {{ user.template }}" style="font-family: {{ user.font_family }}; color: {{ user.theme_color }};">
+    <img src="{{ url_for('static', filename=user.profile_image or 'default-profile.png') }}" class="profile-img">
+    <h2>@{{ user.username }}</h2>
+    <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
+
+    <div class="links">
+        {% for link in sorted_links %}
+            {% set icon = "" %}
+            {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+            {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
+            {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
+            {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
+            {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
+            {% endif %}
+            <a class="link-button {{ user.template }}" href="{{ link.url }}" target="_blank">
+                {% if icon %}<i class="{{ icon }}"></i>{% endif %}
+                {{ link.label }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,509 @@
+/* ====== Allmänt ====== */
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f3f3f3;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.container {
+    max-width: 480px;
+    margin: 2rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+input, button, select, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-family: inherit;
+}
+
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+.flash {
+    background: #ffeeba;
+    color: #856404;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
+
+/* ====== Navbar ====== */
+.navbar {
+    position: sticky;
+    top: 0;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 20px;
+    z-index: 999;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-logo {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+/* ====== Dashboard & Profil ====== */
+.main-content {
+    padding: 30px;
+}
+
+.dashboard {
+    max-width: 600px;
+    margin: auto;
+    text-align: center;
+}
+
+.profile-card {
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+.profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+/* ====== Länkkort ====== */
+.link-card {
+    display: flex;
+    flex-direction: column;
+    background: #f2f2f2;
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin: 8px auto;
+    font-size: 0.95rem;
+    max-width: 600px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s ease;
+    gap: 8px;
+}
+
+.link-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.link-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.link-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    width: 100%;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+.link-label {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.link-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.link-btn {
+    border: none;
+    background: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.link-btn:hover {
+    background: #ddd;
+}
+
+/* ====== Länkknappar (offentlig vy) ====== */
+.link-button {
+    padding: 12px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    display: block;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.link-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* ====== Action-knappar ====== */
+.action-btn {
+    padding: 10px 20px;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 12px;
+    display: inline-block;
+    margin: 10px 10px;
+    transition: all 0.2s ease-in-out;
+    border: none;
+}
+
+.action-btn:hover {
+    transform: scale(1.04);
+    opacity: 0.95;
+}
+
+/* ====== Template-väljare ====== */
+.template-nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.template-nav button {
+    background-color: #ddd;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.template-slider {
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 50%;
+    padding-bottom: 10px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.template-slider::-webkit-scrollbar {
+    display: none;
+}
+
+.template-card {
+    border: 2px solid #ccc;
+    padding: 10px;
+    min-width: 140px;
+    border-radius: 12px;
+    text-align: center;
+    flex-shrink: 0;
+    scroll-snap-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.template-card input {
+    display: none;
+}
+
+.template-card.active {
+    border: 3px solid #007aff;
+    transform: scale(1.05);
+    background: #f0f8ff;
+}
+
+/* ====== Layouts ====== */
+.settings-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.settings-layout.right-preview {
+    flex-direction: row;
+}
+
+@media (max-width: 768px) {
+    .settings-layout.right-preview {
+        flex-direction: column;
+    }
+}
+
+/* ——— Telefon-ram för previewrutan ——— */
+.mobile-preview {
+  width: 360px;
+  height: 640px;
+  border-radius: 40px;
+  background: #fff;               /* eller transparent om du vill se genom temat bakom */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  padding: 24px 16px;
+  overflow-y: auto;
+  position: relative;
+  transform: scale(1);
+  transform-origin: top center;
+  background-clip: border-box;
+  background-origin: border-box;
+}
+
+/* “Notch” längst upp på telefonen */
+.mobile-preview::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 60px;
+  height: 5px;
+  background: #ccc;
+  border-radius: 5px;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.mobile-preview .link-button,
+.mobile-preview .profile-card .link-button {
+    width: calc(100% - 32px);
+    margin: 8px auto;
+    box-sizing: border-box;
+}
+
+.dashboard-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 30px;
+}
+
+.dashboard-panel {
+    flex: 1;
+    min-width: 320px;
+    max-width: 700px;
+}
+
+.preview-panel {
+    width: 360px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+    .dashboard-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+    .preview-panel {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+.settings-layout.right-preview {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+    align-items: flex-start;
+    padding: 30px;
+}
+
+.settings-layout .container {
+    flex: 1;
+    min-width: 320px;
+    max-width: 700px;
+}
+
+.settings-layout .mobile-preview {
+    flex-shrink: 0;
+    width: 360px;
+}
+
+@media (max-width: 900px) {
+    .settings-layout.right-preview {
+        flex-direction: column;
+        align-items: center;
+    }
+    .settings-layout .mobile-preview {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+.preview-panel,
+.settings-layout .mobile-preview {
+    position: sticky;
+    top: 135px;
+    align-self: flex-start;
+}
+
+body.default {
+    background: #f3f3f3;
+}
+
+body.elegant {
+    background: linear-gradient(to bottom, #e0eafc, #cfdef3);
+}
+
+body.dark {
+    background: #1c1c1c;
+    color: #f9f9f9;
+}
+
+body.neon {
+    background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+    color: #0ff;
+}
+
+body.sun {
+    background: linear-gradient(to bottom, #fffbd5, #f9c667);
+}
+
+body.graffiti {
+    background: url('/static/bg-graffiti.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+}
+
+body.rainbow {
+    background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+    color: white;
+}
+
+.public-profile {
+    max-width: 420px;
+    margin: 40px auto;
+    padding: 2rem;
+    border-radius: 24px;
+    background: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+}
+
+.public-profile .profile-img {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 1rem;
+}
+
+.public-profile h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.public-profile p {
+    margin-top: 4px;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.public-profile .links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.public-profile .link-button {
+    max-width: 100%;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+}
+
+.modal-content input {
+    margin-bottom: 1rem;
+}
+
+.modal .close {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.modal .close:hover {
+    color: black;
+    transform: scale(1.1);
+}

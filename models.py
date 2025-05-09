@@ -1,0 +1,27 @@
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+
+db = SQLAlchemy()
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True)
+    password = db.Column(db.String(150))
+    profile_image = db.Column(db.String(200), nullable=True)
+    bio = db.Column(db.String(300), nullable=True)
+    font_family = db.Column(db.String(100), default='Inter')
+    theme_color = db.Column(db.String(20), default='blue')
+    template = db.Column(db.String(50), default='default')
+    links = db.relationship('Link', backref='user')
+    show_links = db.Column(db.Boolean, default=True)
+    is_visible = db.Column(db.Boolean, default=True)
+
+
+class Link(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    label = db.Column(db.String(100))
+    url = db.Column(db.String(200))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    position = db.Column(db.Integer, default=0)
+    is_visible = db.Column(db.Boolean, default=True)  # 🆕 Lägg till detta!
+

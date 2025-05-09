@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}The Social Card{% endblock %}</title>
+
+  <!-- Desktop-CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Mobil-CSS (≤600px) -->
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/mobile.css') }}"
+    media="only screen and (max-width: 600px)"
+  >
+</head>
+<body class="{% if request.endpoint == 'public.public_profile' and user is defined %}{{ user.template }}{% endif %}">
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <!-- Hamburger (syns bara på mobil) -->
+      <button class="hamburger" aria-label="Öppna meny">☰</button>
+
+      <!-- Logotyp -->
+      <div class="nav-logo">TheSocialCard</div>
+
+      <!-- Menylänkar -->
+      <ul class="nav-links">
+        {% if current_user.is_authenticated %}
+          <li><a href="{{ url_for('dashboard.dashboard_view') }}">Dashboard</a></li>
+          <li><a href="{{ url_for('dashboard.profile') }}">Min Profil</a></li>
+          <li><a href="{{ url_for('auth.logout') }}">Logga ut</a></li>
+        {% else %}
+          <li><a href="{{ url_for('auth.register') }}">Logga in</a></li>
+          <li><a href="{{ url_for('auth.register') }}">Registrera</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- Ta bort flash-meddelanden -->
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.flash').forEach(el => el.remove());
+    }, 4000);
+  </script>
+
+  <!-- Hamburger-toggle + slider‐centrering -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1) Hamburger‐meny
+      const btn = document.querySelector('.hamburger');
+      const links = document.querySelector('.nav-links');
+      btn?.addEventListener('click', () => links.classList.toggle('open'));
+
+      // 2) Funktion för att rotera slidern så aktivt kort hamnar mitt
+      function centerSliderOn(card) {
+        const slider = document.querySelector('.template-slider');
+        if (!slider || !card) return;
+
+        // Hämta alla kort
+        const cards = Array.from(slider.children);
+        const count = cards.length;
+        const centerIndex = Math.floor(count / 2);
+        const currentIndex = cards.indexOf(card);
+        let shift = currentIndex - centerIndex;
+
+        // Flytta element framåt eller bakåt
+        if (shift > 0) {
+          for (let i = 0; i < shift; i++) {
+            slider.appendChild(cards.shift());
+          }
+        } else if (shift < 0) {
+          for (let i = 0; i < -shift; i++) {
+            slider.insertBefore(cards.pop(), slider.firstChild);
+          }
+        }
+
+        // Scrolla mitt‐kortet i view
+        const newCards = Array.from(slider.children);
+        const middle = newCards[centerIndex];
+        middle.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+      }
+
+      // 3) På sidladdning: hitta aktivt kort
+      let activeCard =
+        document.querySelector('.template-slider input:checked')?.closest('.template-card')
+        || document.querySelector('.template-card.active');
+      centerSliderOn(activeCard);
+
+      // 4) När du byter mall: scrolla det nya in i mitten
+      document.querySelectorAll('.template-slider input[name="template"]').forEach(inp => {
+        inp.addEventListener('change', () => {
+          const card = inp.closest('.template-card');
+          centerSliderOn(card);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

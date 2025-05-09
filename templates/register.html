@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Registrera{% endblock %}
+{% block content %}
+<h2>Registrera konto</h2>
+<form method="post">
+    <input name="username" placeholder="Användarnamn" required><br>
+    <input type="password" name="password" placeholder="Lösenord" required><br>
+    <button type="submit">Skapa konto</button>
+</form>
+<p>Har du redan ett konto? <a href="{{ url_for('auth.register') }}">Logga in</a></p>
+{% endblock %}

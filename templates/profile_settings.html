@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Profilinställningar{% endblock %}
+{% block content %}
+
+<div class="settings-layout right-preview">
+
+    <!-- ⚙️ Inställningsformulär -->
+    <div class="container">
+        <h2>Uppdatera din profil</h2>
+        <form method="POST" enctype="multipart/form-data" id="profileForm">
+
+            <!-- Profilbild -->
+            <label>Profilbild:</label><br>
+            {% if user.profile_image %}
+                <img src="{{ url_for('static', filename=user.profile_image) }}" class="profile-img"><br>
+            {% endif %}
+            <input type="file" name="profile_image" accept="image/*"><br><br>
+
+            <!-- Font -->
+            <label for="font_family">Font:</label><br>
+            <select name="font_family" id="fontSelect">
+                <option value="Inter" {% if user.font_family == 'Inter' %}selected{% endif %}>Inter</option>
+                <option value="Segoe UI" {% if user.font_family == 'Segoe UI' %}selected{% endif %}>Segoe UI</option>
+                <option value="Roboto" {% if user.font_family == 'Roboto' %}selected{% endif %}>Roboto</option>
+                <option value="Georgia" {% if user.font_family == 'Georgia' %}selected{% endif %}>Georgia</option>
+            </select><br><br>
+
+            <!-- Färgtema -->
+            <label for="theme_color">Färgtema:</label><br>
+            <select name="theme_color" id="colorSelect">
+                <option value="blue" {% if user.theme_color == 'blue' %}selected{% endif %}>Blå</option>
+                <option value="black" {% if user.theme_color == 'black' %}selected{% endif %}>Svart</option>
+                <option value="pink" {% if user.theme_color == 'pink' %}selected{% endif %}>Rosa</option>
+                <option value="green" {% if user.theme_color == 'green' %}selected{% endif %}>Grön</option>
+                <option value="purple" {% if user.theme_color == 'purple' %}selected{% endif %}>Lila</option>
+            </select><br><br>
+
+            <!-- Bio -->
+            <label for="bio">Beskrivning:</label><br>
+            <textarea name="bio" id="bioInput" rows="3">{{ user.bio or '' }}</textarea><br><br>
+
+            <!-- Template-väljare -->
+            <h3>Välj Mall:</h3>
+            <div class="template-nav">
+                <button type="button" onclick="prevTemplate()">⬅️</button>
+                <button type="button" onclick="nextTemplate()">➡️</button>
+            </div>
+
+            <div class="template-slider" id="template-slider">
+                {% for name in ['default', 'elegant', 'dark', 'neon', 'sun', 'graffiti', 'rainbow'] %}
+                <label class="template-card {{ name }}" data-name="{{ name }}">
+                    <input type="radio" name="template" value="{{ name }}" {% if user.template == name %}checked{% endif %}>
+                    <div class="preview">{{ name | capitalize }}</div>
+                </label>
+                {% endfor %}
+            </div>
+
+            <br><br>
+            <button type="submit">Spara inställningar</button>
+        </form>
+    </div>
+
+    <!-- 📱 Mobilpreview -->
+    <div class="mobile-preview {{ user.template }}" id="mobilePreview">
+        <div class="profile-card transparent" id="previewCard">
+            <img src="{{ url_for('static', filename=user.profile_image or 'default-profile.png') }}" class="profile-img" id="previewImg">
+            <h3 id="previewUsername">@{{ user.username }}</h3>
+            <p id="previewBio">{{ user.bio or "Ingen beskrivning ännu." }}</p>
+
+            {% set visible_links = user.links | selectattr('is_visible') | list %}
+            {% if visible_links %}
+            <div class="links" id="previewLinks">
+                {% for link in visible_links %}
+                    {% set icon = "" %}
+                    {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+                    {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
+                    {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
+                    {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
+                    {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}{% endif %}
+                    <a class="link-button {{ user.template }}" href="#" onclick="return false;">
+                        {% if icon %}<i class="{{ icon }}"></i>{% endif %} {{ link.label }}
+                    </a>
+                {% endfor %}
+            </div>
+            {% else %}
+                <p><em>Inga synliga länkar</em></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- 🔁 Live preview JS + SKROLLA TILL MITTEN -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1) Element­referenser
+    const slider            = document.getElementById('template-slider');
+    const prevBtn           = document.querySelector('button[onclick="prevTemplate()"]');
+    const nextBtn           = document.querySelector('button[onclick="nextTemplate()"]');
+    const previewContainer  = document.getElementById('mobilePreview');
+    const previewBio        = document.getElementById('previewBio');
+    const fontField         = document.getElementById('fontSelect');
+    const colorField        = document.getElementById('colorSelect');
+    const bioField          = document.getElementById('bioInput');
+
+    // Hjälpfunktion: alla kort i slidern
+    const cards = () => Array.from(slider.querySelectorAll('.template-card'));
+
+    // 2) Swipe-slider: flytta element så att valt kort hamnar i mitten
+    function centerSliderOn(card) {
+      const all       = cards();
+      const centerIdx = Math.floor(all.length/2);
+      let idx         = all.indexOf(card);
+      if (idx === -1) return;
+      while (idx > centerIdx) {
+        slider.appendChild(all.shift());
+        idx--;
+      }
+      while (idx < centerIdx) {
+        slider.insertBefore(all.pop(), slider.firstChild);
+        idx++;
+      }
+    }
+
+    function updateSlider() {
+      const all     = cards();
+      const checked = all.find(c => c.querySelector('input').checked);
+      if (checked) centerSliderOn(checked);
+    }
+
+    // Knappar för prev/next
+    prevBtn.addEventListener('click', () => {
+      slider.insertBefore(slider.lastElementChild, slider.firstChild);
+      const all = cards();
+      all[Math.floor(all.length/2)].querySelector('input').checked = true;
+      updateAll();
+    });
+    nextBtn.addEventListener('click', () => {
+      slider.appendChild(slider.firstElementChild);
+      const all = cards();
+      all[Math.floor(all.length/2)].querySelector('input').checked = true;
+      updateAll();
+    });
+
+    // Klick på kort ska välja det och centrera
+    slider.addEventListener('click', e => {
+      const card = e.target.closest('.template-card');
+      if (!card) return;
+      card.querySelector('input').checked = true;
+      updateAll();
+    });
+
+    // 3) Live-preview: tema‐klass, font, färg & bio
+    function updatePreviewStyles() {
+      // Tema‐klass på containern
+      const theme = slider.querySelector('input:checked').value;
+      previewContainer.className = 'mobile-preview ' + theme;
+
+      // Font‐familj & textfärg
+      previewContainer.style.fontFamily = fontField.value;
+      previewContainer.style.color      = colorField.value;
+
+      // Bio‐text
+      previewBio.innerText = bioField.value || "Ingen beskrivning ännu.";
+    }
+
+    // Slå ihop allt i en uppdaterings­funktion
+    function updateAll() {
+      updateSlider();
+      updatePreviewStyles();
+    }
+
+    // Koppla live-preview-lyssnare
+    fontField.addEventListener('change', updatePreviewStyles);
+    colorField.addEventListener('change', updatePreviewStyles);
+    bioField.addEventListener('input',  updatePreviewStyles);
+
+    // Init vid sidladdning
+    updateAll();
+  });
+</script>
+
+{% endblock %}

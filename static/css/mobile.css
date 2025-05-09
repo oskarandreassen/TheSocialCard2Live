@@ -1,0 +1,365 @@
+/* mobile.css — overrides för skärmar ≤600px */
+@media only screen and (max-width: 600px) {
+  /* Flytta public-profile närmare toppen */
+  .public-page-wrapper {
+    justify-content: flex-start !important;
+    padding-top: 40px !important;
+  }
+
+ /* ————— Override så hamburgaren inte blir fullbredd ————— */
+  .hamburger {
+    display: block !important;
+    position: absolute !important;
+    top: 10px !important;
+    left: 10px !important;
+
+    /* Gör knappen så liten den kan bli utan att style.css bråkar */
+    width: auto !important;
+    padding: 0.5rem !important;
+    font-size: 1.5rem !important;
+    line-height: 1 !important;
+
+    background: none !important;
+    border: none !important;
+    color: #333 !important;    /* eller valfri färg */
+  }
+
+  /* Make profile card wider and add spacing */
+  .public-profile {
+    width: 95% !important;
+    max-width: none !important;
+    padding: 28px 24px !important;
+    border-radius: 18px !important;
+  }
+  .public-profile h2 {
+    font-size: 1.7rem !important;
+  }
+  .public-profile p {
+    font-size: 1.1rem !important;
+  }
+  .public-profile .link-button {
+    padding: 16px 24px !important;
+    font-size: 1rem !important;
+    margin: 8px auto !important;
+  }
+
+  /* Base reset and typography */
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: inherit;
+    text-align: center;
+    height: auto;
+  }
+
+   /* ===== Navbar & Hamburger ===== */
+  .navbar {
+    position: sticky !important;
+    top: 0 !important;
+    padding: 10px !important;
+    background: inherit !important;
+    border-bottom: 1px solid #ddd !important;
+    z-index: 1000 !important;
+  }
+  .navbar .nav-container {
+    position: relative !important;
+  }
+
+  .hamburger {
+    display: block !important;
+    position: absolute !important;
+    top: 12px !important;
+    left: 1rem !important;
+    background: none !important;
+    border: none !important;
+    font-size: 1.5rem !important;
+    padding: 0.5rem !important;
+    cursor: pointer !important;
+    color: #333 !important;
+    z-index: 1001 !important;
+  }
+
+  /* Dropdown-menyn */
+  .nav-links {
+    display: none !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: #fff !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+    flex-direction: column !important;
+    border-radius: 8px !important;
+    min-width: 180px !important;
+    overflow: hidden !important;
+    z-index: 999 !important;
+    .nav-links.open {
+    display: flex !important;
+  }
+  .nav-links a {
+    padding: 0.75rem 1rem !important;
+    border-bottom: 1px solid #eee !important;
+    text-align: left !important;
+    color: inherit !important;
+  }
+  .nav-links a:last-child {
+    border-bottom: none !important;
+  }
+}.nav-links.open {
+    display: flex !important;
+  }
+  .nav-links a {
+    padding: 0.75rem 1rem !important;
+    border-top: 1px solid #eee !important;
+    text-align: center !important;
+  }
+
+
+
+  /* Flash spacing */
+  .flash {
+    margin-bottom: 12px;
+  }
+
+  /* Dashboard & settings: column layout */
+  .dashboard-layout,
+  .settings-layout,
+  .settings-layout.right-preview {
+    flex-direction: column !important;
+    padding: 16px !important;
+    gap: 16px !important;
+  }
+
+  /* Panels full width */
+  .dashboard-panel,
+  .preview-panel,
+  .settings-layout .mobile-preview {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+
+
+  /* Prevent buttons overflow */
+  .mobile-preview .link-button,
+  .mobile-preview .profile-card .link-button {
+    width: calc(100% - 32px) !important;
+    margin: 8px auto !important;
+    box-sizing: border-box !important;
+  }
+
+  /* User's own profile card spacing */
+  .profile-card {
+    margin: 40px auto !important;
+    padding: 24px 20px !important;
+    max-width: 460px !important;
+    background: rgba(255,255,255,0.05) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
+    backdrop-filter: blur(4px) !important;
+    text-align: center;
+  }
+  .profile-card .link-button {
+    margin: 8px auto !important;
+  }
+
+  /* Modal size */
+  .modal-content {
+    width: 90% !important;
+    max-width: 360px !important;
+  }
+
+/* Temabakgrunder: override globalt */
+  .mobile-preview.default   { background: #fff !important;                     color: #333; }
+  .mobile-preview.elegant   { background: linear-gradient(to bottom, #e0eafc, #cfdef3) !important; color: #333; }
+  .mobile-preview.dark      { background: #1c1c1c !important;                color: #f9f9f9; }
+  .mobile-preview.neon      { background: linear-gradient(to right, #0f0c29, #302b63, #24243e) !important; color: #0ff; }
+  .mobile-preview.sun       { background: linear-gradient(to bottom, #fffbd5, #f9c667) !important; }
+  .mobile-preview.graffiti  { background: url('/static/bg-graffiti.jpg') center/cover no-repeat !important; background-size:cover !important; color: #fff; }
+  .mobile-preview.rainbow   { background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet) !important; color: #fff; }
+}
+
+
+/* ===== mobil-navbar ===== */
+.navbar .nav-container {
+  flex-direction: column;
+  align-items: center;
+}
+.navbar .nav-links {
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ===== centrerade formulär på mobil ===== */
+.container {
+  padding: 16px;
+}
+.container form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.container form input,
+.container form button {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* ===== ta bort ev vitt mellanrum på kropp ===== */
+body {
+  background-color: inherit;   /* säkerställ att bakgrunds-tema syns även på login */
+  color: inherit;
+}
+
+/* ================================
+   Mobil: allt under .main-content
+   tar upp nästan hela bredden
+   ================================ */
+.main-content > * {
+  width: 95%;
+  max-width: 400px;
+  margin: 1rem auto;
+  box-sizing: border-box;
+}
+
+/* ================================
+   Mobil­anpassning för /themes
+   ================================ */
+@media only screen and (max-width: 600px) {
+  /* 1. Gör hela innehållet mer luftigt och smalare */
+  .main-content {
+    padding: 1rem 0.5rem !important;
+  }
+
+  /* 2. Stapla själva settings-layout vertikalt */
+  .settings-layout.right-preview {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+  }
+
+  /* 3. Gör formulärdelen (container) full-bredd */
+  .settings-layout.right-preview > .container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 1rem !important;
+  }
+
+  /* 4. Gör preview-delen full-bredd, skalad automatiskt */
+  .settings-layout.right-preview > .mobile-preview {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    transform: scale(0.9) !important;
+    transform-origin: top center !important;
+    padding: 1rem !important;
+  }
+
+  /* 5. Gör template-slider horisontell scroll tydligare */
+  .template-slider {
+    padding-bottom: 1rem !important;
+    gap: 0.5rem !important;
+  }
+  .template-card {
+    min-width: 140px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* 6. Full­bredd på input och select */
+  .settings-layout.right-preview input,
+  .settings-layout.right-preview select,
+  .settings-layout.right-preview button {
+    width: 100% !important;
+    font-size: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* 7. Större touch-ytor på action-knappar */
+  .action-btn,
+  .template-nav button {
+    padding: 0.75rem 1rem !important;
+    font-size: 1rem !important;
+  }
+
+  /* 8. Dölj onödig sidomeny (om du har en hamburger) */
+  .nav-links {
+    display: none !important;
+  }
+  .hamburger {
+    display: block !important;
+    position: absolute;
+    top: 12px;
+    left: 1rem;
+  }
+
+  /* ——— Slider: scroll-snap centrerad ——— */
+  .template-slider {
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    scroll-padding-inline: 50% !important;
+  }
+  .template-card {
+    scroll-snap-align: center !important;
+  }
+}
+
+/* ——————— Hamburger-meny ——————— */
+.hamburger {
+  display: block;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.nav-links {
+  display: none;
+  flex-direction: column;
+  gap: 0;            /* nollställ gap för att kunna styra avstånd manuellt */
+  margin-top: 0.5rem;
+}
+.nav-links.open {
+  display: flex;
+}
+.nav-links a {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #eee;
+}
+
+/* Dölj hamburger och visa vanlig meny på större skärmar igen */
+@media only screen and (min-width: 601px) {
+  .hamburger { display: none !important; }
+  .nav-links { display: flex !important; flex-direction: row; gap: 1rem; margin: 0; }
+
+  /* Centrera all content i desktop */
+  .main-content {
+    display: flex !important;
+    justify-content: center !important;
+  }
+}
+
+/* ——— Tätare mellan fält ——— */
+.settings-layout.right-preview label {
+  display: block;
+  margin: 0.5rem 0 0.25rem;  /* lite mindre mellan label och fält */
+}
+.settings-layout.right-preview input,
+.settings-layout.right-preview select,
+.settings-layout.right-preview textarea {
+  margin: 0 0 0.75rem;       /* mindre mellan fälten */
+  padding: 0.75rem 1rem;     /* behåll god touch-yta */
+  font-size: 1rem;
+}
+
+/* ————— Dölj alla <br> på Themes-sidan ————— */
+.settings-layout.right-preview br {
+  display: none !important;
+}
+
