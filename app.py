@@ -14,9 +14,6 @@ app = Flask(
     static_folder='static'
 )
 
-print("🗄️  Using database:", app.config['SQLALCHEMY_DATABASE_URI'])
-
-
 # ── Hemlig nyckel ───────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = 'din-superhemliga-nyckel'
 
@@ -24,8 +21,6 @@ app.config['SECRET_KEY'] = 'din-superhemliga-nyckel'
 os.makedirs(app.instance_path, exist_ok=True)
 
 # ── Dynamisk databas-URI ───────────────────────────────────────────────
-# Om vi har env-variabel DATABASE_URL (Render), använd den.
-# Annars lokalt: absolut sökväg till instance/users.db
 database_url = os.getenv('DATABASE_URL')
 if database_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
@@ -33,6 +28,11 @@ else:
     sqlite_path = os.path.join(app.instance_path, 'users.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{sqlite_path}'
 
+# ── Debug prints – körs först *efter* att URI:en är definierad ─────────
+print("🗄️ Using database URI:", app.config['SQLALCHEMY_DATABASE_URI'])
+print("📂 Contents of instance/:", os.listdir(app.instance_path))
+
+# ── Resten av din konfig ───────────────────────────────────────────────
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
@@ -53,13 +53,12 @@ def load_user(user_id):
 @app.before_request
 def require_login():
     exempt = {
-        'auth.login', 'auth.register',    # inloggningssidor
-        'public.public_profile',          # publika profilen
-        'static'                          # statiska filer
+        'auth.login', 'auth.register',
+        'public.public_profile',
+        'static'
     }
     if not current_user.is_authenticated and request.endpoint not in exempt:
         return redirect(url_for('auth.login'))
-
 
 # ── Registrera blueprints ─────────────────────────────────────────────
 from views.auth_routes      import auth
@@ -71,7 +70,6 @@ app.register_blueprint(auth)
 app.register_blueprint(dashboard)
 app.register_blueprint(themes)
 app.register_blueprint(public)
-
 
 # ── Kör app ───────────────────────────────────────────────────────────
 if __name__ == '__main__':
