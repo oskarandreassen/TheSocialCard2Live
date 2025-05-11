@@ -17,20 +17,30 @@ app = Flask(
 # ── Hemlig nyckel ───────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = 'din-superhemliga-nyckel'
 
-# ── Se till att instance-mappen finns ──────────────────────────────────
+# ── Se till att instance-mappen finns (för lokal fallback) ─────────────
 os.makedirs(app.instance_path, exist_ok=True)
 
 # ── Dynamisk databas-URI ───────────────────────────────────────────────
 database_url = os.getenv('DATABASE_URL')
 if database_url:
+    # På Render: monterad disk under /user/data
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
+    # Lokalt: vi sparar i instance/users.db
     sqlite_path = os.path.join(app.instance_path, 'users.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{sqlite_path}'
 
-# ── Debug prints – körs först *efter* att URI:en är definierad ─────────
-print("🗄️ Using database URI:", app.config['SQLALCHEMY_DATABASE_URI'])
-print("📂 Contents of instance/:", os.listdir(app.instance_path))
+# ── Debug: skriv ut var databasen pekas och vad som finns lokalt ───────
+print("🗄️  Using database URI:", app.config['SQLALCHEMY_DATABASE_URI'])
+# Lista innehåll i två platser för felsökning:
+#  - Render-disk: /user/data (om env DATABASE_URL används)
+#  - Lokalt: instance/
+try:
+    render_disk = os.listdir('/user/data')
+except FileNotFoundError:
+    render_disk = None
+print("📂 Contents of /user/data:", render_disk)
+print("📂 Contents of instance/ :", os.listdir(app.instance_path))
 
 # ── Resten av din konfig ───────────────────────────────────────────────
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
