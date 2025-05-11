@@ -81,6 +81,14 @@ app.register_blueprint(dashboard)
 app.register_blueprint(themes)
 app.register_blueprint(public)
 
+
+# ── Skapa tabeller om de saknas (trycker direkt mot /user/data eller instance/) ──
+with app.app_context():
+    # Detta kommer bara skapa de tabeller som saknas
+    db.create_all()
+    print("✅ Säkerställt att alla tabeller finns:",
+          sqlite_path if not database_url else database_url)
+
 # ── Kör app ───────────────────────────────────────────────────────────
 if __name__ == '__main__':
     app.run(debug=True)
