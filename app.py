@@ -82,12 +82,15 @@ app.register_blueprint(themes)
 app.register_blueprint(public)
 
 
-# ── Skapa tabeller om de saknas (trycker direkt mot /user/data eller instance/) ──
+# ── Säkerställ schema ────────────────────────────────────────────────
 with app.app_context():
-    # Detta kommer bara skapa de tabeller som saknas
-    db.create_all()
-    print("✅ Säkerställt att alla tabeller finns:",
-          sqlite_path if not database_url else database_url)
+    from sqlalchemy import inspect
+    insp = inspect(db.engine)
+    if not insp.has_table('user') or not insp.has_table('link'):
+        db.create_all()
+        print("✅ Skapade tabeller:", ", ".join(db.metadata.tables.keys()))
+    else:
+        print("🔍 Tabellerna finns redan, hoppar över create_all()")
 
 # ── Kör app ───────────────────────────────────────────────────────────
 if __name__ == '__main__':
