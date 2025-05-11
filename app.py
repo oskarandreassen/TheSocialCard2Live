@@ -31,16 +31,14 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{sqlite_path}'
 
 # ── Debug: skriv ut var databasen pekas och vad som finns lokalt ───────
-#print("🗄️  Using database URI:", app.config['SQLALCHEMY_DATABASE_URI'])
-# Lista innehåll i två platser för felsökning:
-#  - Render-disk: /user/data (om env DATABASE_URL används)
-#  - Lokalt: instance/
-try:
-    render_disk = os.listdir('/user/data')
-except FileNotFoundError:
-    render_disk = None
-#print("📂 Contents of /user/data:", render_disk)
-#print("📂 Contents of instance/ :", os.listdir(app.instance_path))
+# (Kommentarade ut prints så de inte stör produktion)
+# print("🗄️  Using database URI:", app.config['SQLALCHEMY_DATABASE_URI'])
+# try:
+#     render_disk = os.listdir('/user/data')
+# except FileNotFoundError:
+#     render_disk = None
+# print("📂 Contents of /user/data:", render_disk)
+# print("📂 Contents of instance/ :", os.listdir(app.instance_path))
 
 # ── Resten av din konfig ───────────────────────────────────────────────
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -88,9 +86,10 @@ with app.app_context():
     insp = inspect(db.engine)
     if not insp.has_table('user') or not insp.has_table('link'):
         db.create_all()
-        #print("✅ Skapade tabeller:", ", ".join(db.metadata.tables.keys()))
+        # print("✅ Skapade tabeller:", ", ".join(db.metadata.tables.keys()))
     else:
-        #print("🔍 Tabellerna finns redan, hoppar över create_all()")
+        # Tabellerna finns redan, hoppa över create_all()
+        pass
 
 # ── Kör app ───────────────────────────────────────────────────────────
 if __name__ == '__main__':
