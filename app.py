@@ -14,6 +14,9 @@ app = Flask(
     static_folder='static'
 )
 
+print("🗄️  Using database:", app.config['SQLALCHEMY_DATABASE_URI'])
+
+
 # ── Hemlig nyckel ───────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = 'din-superhemliga-nyckel'
 
@@ -57,6 +60,7 @@ def require_login():
     if not current_user.is_authenticated and request.endpoint not in exempt:
         return redirect(url_for('auth.login'))
 
+
 # ── Registrera blueprints ─────────────────────────────────────────────
 from views.auth_routes      import auth
 from views.dashboard_routes import dashboard
@@ -67,6 +71,7 @@ app.register_blueprint(auth)
 app.register_blueprint(dashboard)
 app.register_blueprint(themes)
 app.register_blueprint(public)
+
 
 # ── Kör app ───────────────────────────────────────────────────────────
 if __name__ == '__main__':
