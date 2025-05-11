@@ -326,8 +326,8 @@ button:hover {
 .dashboard-layout {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 40px;
+  justify-content: center;
+  gap: 160px;
   padding: 30px;
 }
 
@@ -386,6 +386,20 @@ body.neon    { background: linear-gradient(to right,#0f0c29,#302b63,#24243e); co
 body.sun     { background: linear-gradient(to bottom,#fffbd5,#f9c667); }
 body.graffiti{ background: url('/static/bg-graffiti.jpg') center/cover no-repeat; background-size: cover; color: #fff; }
 body.rainbow { background: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); color: #fff; }
+
+/* --- Desktop-preview (samma färg på knappar i mobilen) --- */
+.mobile-preview.default  .link-button { background: #007bff;           color: #fff;   box-shadow: none; }
+.mobile-preview.elegant  .link-button { background: #ddd;             color: #333;   box-shadow: none; }
+.mobile-preview.dark     .link-button { background: #1c1c1c;          color: #f9f9f9; box-shadow: none; }
+.mobile-preview.neon     .link-button { background: none;             border: 2px solid #0ff;  color: #0ff;    box-shadow: none; }
+.mobile-preview.sun      .link-button { background: #f9c667;          color: #333;   box-shadow: none; }
+.mobile-preview.graffiti .link-button { background: rgba(255,255,255,0.2); color: #fff; box-shadow: none; }
+.mobile-preview.rainbow  .link-button {
+  background: none;
+  background-image: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet);
+  color: #fff;
+  box-shadow: none;
+}
 
 /* ==========================================================================
    14. Public-profile (specialutseende)

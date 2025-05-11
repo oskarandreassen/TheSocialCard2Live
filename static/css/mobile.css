@@ -122,14 +122,17 @@
     padding: 1rem !important;
     overflow-x: hidden !important;
   }
-  .settings-layout.right-preview > .mobile-preview {
-    margin: 1rem auto 0 !important;
-    transform: scale(0.9);
-    transform-origin: top center;
-    padding: 1rem;
-    width: 100%;
-    max-width: none;
-  }
+    .settings-layout.right-preview .mobile-preview {
+      margin-top: 1rem;
+      margin-left: auto;
+      margin-right: auto;
+      transform: scale(0.9);
+      transform-origin: top center;
+      padding: 1rem;
+      width: 360px;   /* om du vill ha samma absoluta bredd */
+      height: 640px;  /* om du vill ha samma absoluta höjd */
+      box-sizing: border-box;
+    }
 
   /* ─── 6) Mobile Preview Buttons (layout only) ─────────────────────── */
   .settings-layout.right-preview .mobile-preview .link-button {

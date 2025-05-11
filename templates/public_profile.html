@@ -108,25 +108,37 @@ body {
         <h2>@{{ user.username }}</h2>
         <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
 
-        {% set visible_links = links | selectattr('is_visible') | list %}
-        {% if visible_links %}
-            <div class="links">
+            {% set visible_links = links | selectattr('is_visible') | list %}
+            {% if visible_links %}
+              <div class="links">
                 {% for link in visible_links %}
-                    {% set icon = "" %}
-                    {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
-                    {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
-                    {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
-                    {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
-                    {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
-                    {% endif %}
-                    <a class="link-button {{ user.template }}" href="{{ link.url }}" target="_blank">
-                        {% if icon %}<i class="{{ icon }}"></i>{% endif %} {{ link.label }}
-                    </a>
+                  {% set icon = "" %}
+                  {% if "instagram.com" in link.url %}
+                    {% set icon = "fab fa-instagram" %}
+                  {% elif "facebook.com" in link.url %}
+                    {% set icon = "fab fa-facebook" %}
+                  {% elif "linkedin.com" in link.url %}
+                    {% set icon = "fab fa-linkedin" %}
+                  {% elif "youtube.com" in link.url %}
+                    {% set icon = "fab fa-youtube" %}
+                  {% elif "twitter.com" in link.url %}
+                    {% set icon = "fab fa-twitter" %}
+                  {% elif "snapchat.com" in link.url %}
+                    {% set icon = "fab fa-snapchat" %}
+                  {% elif "github.com" in link.url %}
+                    {% set icon = "fab fa-github" %}
+                  {% elif "tiktok.com" in link.url %}
+                    {% set icon = "fab fa-tiktok" %}
+                  {% endif %}
+                  <a class="link-button {{ user.template }}" href="{{ link.url }}" target="_blank">
+                    {% if icon %}<i class="{{ icon }}"></i>{% endif %} {{ link.label }}
+                  </a>
                 {% endfor %}
-            </div>
-        {% else %}
-            <p><em>Användaren har valt att dölja sina länkar.</em></p>
-        {% endif %}
+              </div>
+            {% else %}
+              <p><em>Användaren har valt att dölja sina länkar.</em></p>
+            {% endif %}
+
     </div>
 </div>
 

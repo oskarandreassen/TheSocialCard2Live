@@ -21,11 +21,15 @@
           <div class="links" id="preview-links">
             {% for link in sorted_links if link.is_visible %}
               {% set icon = "" %}
-              {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
-              {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
-              {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
-              {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
-              {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}{% endif %}
+                  {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+                  {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
+                  {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
+                  {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
+                  {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
+                  {% elif "snapchat" in link.url %}{% set icon = "fab fa-snapchat" %}
+                  {% elif "github" in link.url %}{% set icon = "fab fa-github" %}
+                  {% elif "tiktok" in link.url %}{% set icon = "fab fa-tiktok" %}
+                  {% endif %}
               <a class="link-button {{ user.template }}"
                  href="#"
                  onclick="return false;">
@@ -62,11 +66,15 @@
     <div id="link-list" class="links">
       {% for link in sorted_links %}
         {% set icon = "" %}
-        {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
-        {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
-        {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
-        {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
-        {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}{% endif %}
+            {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+            {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
+            {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
+            {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
+            {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
+            {% elif "snapchat" in link.url %}{% set icon = "fab fa-snapchat" %}
+            {% elif "github" in link.url %}{% set icon = "fab fa-github" %}
+            {% elif "tiktok" in link.url %}{% set icon = "fab fa-tiktok" %}
+            {% endif %}
 
         <div class="link-card"
              data-id="{{ link.id }}"
@@ -116,11 +124,15 @@
         <div class="links" id="preview-links">
           {% for link in sorted_links if link.is_visible %}
             {% set icon = "" %}
-            {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
-            {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
-            {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
-            {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
-            {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}{% endif %}
+              {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+              {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
+              {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
+              {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
+              {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
+              {% elif "snapchat" in link.url %}{% set icon = "fab fa-snapchat" %}
+              {% elif "github" in link.url %}{% set icon = "fab fa-github" %}
+              {% elif "tiktok" in link.url %}{% set icon = "fab fa-tiktok" %}
+              {% endif %}
             <a class="link-button {{ user.template }}"
                href="#"
                onclick="return false;">
