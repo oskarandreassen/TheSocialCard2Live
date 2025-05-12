@@ -14,6 +14,39 @@ app = Flask(
     static_folder='static'
 )
 
+# app.py
+ICONS = {
+  'facebook':    'fab fa-facebook',
+  'instagram':   'fab fa-instagram',
+  'twitter':     'fab fa-twitter',
+  'linkedin':    'fab fa-linkedin',
+  'youtube':     'fab fa-youtube',
+  'tiktok':      'fab fa-tiktok',
+  'snapchat':    'fab fa-snapchat',
+  'github':      'fab fa-github',
+  'gitlab':      'fab fa-gitlab',
+  'spotify':     'fab fa-spotify',
+  'soundcloud':  'fab fa-soundcloud',
+  'vimeo':       'fab fa-vimeo-v',
+  'twitch':      'fab fa-twitch',
+  'dribbble':    'fab fa-dribbble',
+  'behance':     'fab fa-behance',
+  'medium':      'fab fa-medium',
+  'pinterest':   'fab fa-pinterest',
+  'reddit':      'fab fa-reddit',
+  'tumblr':      'fab fa-tumblr',
+  'whatsapp':    'fab fa-whatsapp',
+  'telegram':    'fab fa-telegram',
+  'slack':       'fab fa-slack',
+  'discord':     'fab fa-discord',
+  'skype':       'fab fa-skype',
+  'mastodon':    'fab fa-mastodon'
+}
+
+# Gör ICONS tillgängligt i alla templates:
+app.jinja_env.globals['ICONS'] = ICONS
+
+
 # ── Hemlig nyckel ───────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = 'din-superhemliga-nyckel'
 
@@ -90,6 +123,8 @@ with app.app_context():
     else:
         # Tabellerna finns redan, hoppa över create_all()
         pass
+
+
 
 # ── Kör app ───────────────────────────────────────────────────────────
 if __name__ == '__main__':

@@ -6,6 +6,7 @@ db = SQLAlchemy()
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True)
+    display_name = db.Column(db.String(150), nullable=True)  # ← NYTT
     password = db.Column(db.String(150))
     profile_image = db.Column(db.String(200), nullable=True)
     bio = db.Column(db.String(300), nullable=True)

@@ -26,6 +26,7 @@ def themes_view():
         current_user.font_family = request.form.get('font_family')
         current_user.theme_color = request.form.get('theme_color')
         current_user.bio = request.form.get('bio')
+        current_user.display_name = request.form.get('display_name') or None  # ← NYTT
         current_user.template = request.form.get('template')
         db.session.commit()
         flash("Profil uppdaterad!")
