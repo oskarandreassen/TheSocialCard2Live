@@ -4,6 +4,8 @@ from flask_login import login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
 from forms import RegisterForm, LoginForm
+from flask import session
+
 
 auth = Blueprint('auth', __name__)
 
@@ -40,7 +42,8 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
-            login_user(user)
+            login_user(user, remember=True)
+            session.permanent = True
             return redirect(url_for('dashboard.dashboard_view'))
 
         flash("Fel användarnamn eller lösenord.", "danger")

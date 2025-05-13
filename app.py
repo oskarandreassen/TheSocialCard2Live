@@ -7,6 +7,7 @@ from flask_login import LoginManager, current_user
 from flask_migrate import Migrate, upgrade as migrate_upgrade
 from sqlalchemy import inspect as sa_inspect
 from models import db, User
+from datetime import timedelta
 
 # ── Logging setup ─────────────────────────────────────────────────────
 logging.basicConfig(level=logging.DEBUG)
@@ -19,6 +20,12 @@ app = Flask(
     template_folder='templates',
     static_folder='static'
 )
+
+
+# … efter app = Flask(…)
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(minutes=5)
+
+
 
 # ── Configuration ─────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'din-superhemliga-nyckel')
