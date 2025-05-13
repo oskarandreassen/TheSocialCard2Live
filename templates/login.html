@@ -1,11 +1,24 @@
 {% extends "base.html" %}
 {% block title %}Logga in{% endblock %}
 {% block content %}
-<h2>Logga in</h2>
-<form method="post">
-    <input name="username" placeholder="Användarnamn" required><br>
-    <input type="password" name="password" placeholder="Lösenord" required><br>
-    <button type="submit">Logga in</button>
-</form>
-<p>Har du inget konto? <a href="{{ url_for('auth.register') }}">Registrera dig</a></p>
+  <h2>Logga in</h2>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.username.label }}<br>
+      {{ form.username(class="form-input") }}<br>
+      {% for err in form.username.errors %}
+        <span class="error">{{ err }}</span><br>
+      {% endfor %}
+    </p>
+    <p>
+      {{ form.password.label }}<br>
+      {{ form.password(class="form-input") }}<br>
+      {% for err in form.password.errors %}
+        <span class="error">{{ err }}</span><br>
+      {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+  </form>
+  <p>Inget konto? <a href="{{ url_for('auth.register') }}">Registrera dig</a></p>
 {% endblock %}

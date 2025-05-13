@@ -5,14 +5,14 @@ from flask import Flask, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
 from flask_migrate import Migrate, upgrade as migrate_upgrade
-from sqlalchemy import create_engine, inspect as sa_inspect
+from sqlalchemy import inspect as sa_inspect
 from models import db, User
 
 # ── Logging setup ─────────────────────────────────────────────────────
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# ── Skapa app med instance-mapp ────────────────────────────────────────
+# ── Flask app initialization ──────────────────────────────────────────
 app = Flask(
     __name__,
     instance_relative_config=True,
@@ -20,101 +20,83 @@ app = Flask(
     static_folder='static'
 )
 
-# ── Grundläggande config ───────────────────────────────────────────────
-app.config['SECRET_KEY'] = 'din-superhemliga-nyckel'
+# ── Configuration ─────────────────────────────────────────────────────
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'din-superhemliga-nyckel')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
-# ── Se till att instance-mappen finns ─────────────────────────────────
+# ── Ensure instance folder exists ─────────────────────────────────────
 os.makedirs(app.instance_path, exist_ok=True)
 
-# ── Val av databas-URI med fallback och debug-loggning ─────────────────
-DATABASE_URL = os.getenv('DATABASE_URL')
-logger.debug(f"Environment DATABASE_URL: {DATABASE_URL}")
+# ── Determine database URI ─────────────────────────────────────────────
+# If DATABASE_URL env var is set, use it (production/Render), else local SQLite
+database_url = os.getenv('DATABASE_URL')
+if database_url:
+    db_uri = database_url
+    run_migrations = True
+else:
+    sqlite_path = os.path.join(app.instance_path, 'users.db')
+    db_uri = f'sqlite:///{sqlite_path}'
+    run_migrations = False
 
-candidates = []
-if DATABASE_URL:
-    candidates.append(DATABASE_URL)
-candidates.append('sqlite:////user/data/users.db')
-sqlite_local = os.path.join(app.instance_path, 'users.db')
-candidates.append(f'sqlite:///{sqlite_local}')
-candidates.append('sqlite:///backup/users_backup.db')
-logger.debug(f"DB candidates: {candidates}")
+app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+logger.info(f"Using DB URI: {db_uri}")
 
-chosen_uri = None
-for uri in candidates:
-    try:
-        engine = create_engine(uri)
-        insp = sa_inspect(engine)
-        logger.debug(f"Inspecting URI {uri}: tables={insp.get_table_names()}")
-        if insp.has_table('user') or uri.startswith('sqlite:///'):
-            chosen_uri = uri
-            logger.info(f"Chosen DB URI: {chosen_uri}")
-            break
-    except Exception as e:
-        logger.warning(f"Failed to connect/test URI {uri}: {e}")
-
-if not chosen_uri:
-    logger.error('Ingen giltig databas-URI kunde hittas')
-    raise RuntimeError('Ingen giltig databas-URI kunde hittas')
-
-app.config['SQLALCHEMY_DATABASE_URI'] = chosen_uri
-logger.debug(f"→ Using DB URI: {chosen_uri}")
-
-# ── Initiera DB och migrations ─────────────────────────────────────────
+# ── Initialize DB and migrations ───────────────────────────────────────
 db.init_app(app)
 migrate = Migrate(app, db)
 
-# ── Automatisk migrering vid start med felhantering ────────────────────
-if chosen_uri != f'sqlite:///{sqlite_local}':  # migrera för extern eller render
+# ── Apply Alembic migrations if running against external DB ────────────
+if run_migrations:
     try:
         with app.app_context():
-            logger.info("Running migrations...")
+            logger.info("Applying pending migrations...")
             migrate_upgrade()
             logger.info("Migrations applied successfully")
     except Exception as e:
         logger.error(f"Migration failed: {e}")
-        # pdb.set_trace()  # Uncomment for interactive debugging
+        # For debugging, uncomment:
+        # import pdb; pdb.set_trace()
 
 # ── Flask-Login setup ─────────────────────────────────────────────────
 login_manager = LoginManager(app)
-login_manager.login_view    = 'auth.login'
+login_manager.login_view = 'auth.login'
 login_manager.login_message = "Du måste logga in för att se den här sidan."
 
 @login_manager.user_loader
 def load_user(user_id):
-    logger.debug(f"Loading user with ID: {user_id}")
+    logger.debug(f"Loading user id {user_id}")
     return User.query.get(int(user_id))
 
-# ── Tvinga inloggning för alla endpoints utom undantag ────────────────
+# ── Require login for protected routes ─────────────────────────────────
 @app.before_request
 def require_login():
     exempt = {'auth.login', 'auth.register', 'public.public_profile', 'static'}
     if not current_user.is_authenticated and request.endpoint not in exempt:
-        logger.debug(f"Unauthorized access attempt to {request.endpoint}")
+        logger.debug(f"Blocked access to {request.endpoint}")
         return redirect(url_for('auth.login'))
 
-# ── Registrera blueprints ─────────────────────────────────────────────
+# ── Register blueprints ───────────────────────────────────────────────
 from views.auth_routes      import auth
 from views.dashboard_routes import dashboard
 from views.themes_routes    import themes
 from views.public_routes    import public
-
 app.register_blueprint(auth)
 app.register_blueprint(dashboard)
 app.register_blueprint(themes)
 app.register_blueprint(public)
 
-# ── Fallback: skapa tables om de inte finns (lokalt/test) ──────────────
-with app.app_context():
-    insp_main = sa_inspect(db.engine)
-    existing = insp_main.get_table_names()
-    logger.debug(f"Existing tables before fallback: {existing}")
-    if 'user' not in existing or 'link' not in existing:
-        logger.info("Creating missing tables via db.create_all()")
-        db.create_all()
+# ── Create missing tables locally if not using migrations ─────────────
+if not run_migrations:
+    with app.app_context():
+        insp = sa_inspect(db.engine)
+        existing = insp.get_table_names()
+        logger.debug(f"Existing tables locally: {existing}")
+        if 'user' not in existing or 'link' not in existing:
+            logger.info("Creating tables via db.create_all() (local)")
+            db.create_all()
 
-# ── Starta server ──────────────────────────────────────────────────────
+# ── Run server ────────────────────────────────────────────────────────
 if __name__ == '__main__':
-    debug_mode = chosen_uri.startswith('sqlite:///') and not DATABASE_URL
+    debug_mode = not run_migrations
     app.run(debug=debug_mode)
