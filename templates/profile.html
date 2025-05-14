@@ -1,44 +1,94 @@
 {% extends "base.html" %}
 {% block title %}Min Profil{% endblock %}
 {% block content %}
-<div class="profile-card {{ user.template }}" style="font-family: {{ user.font_family }}; color: {{ user.theme_color }};">
-    <img src="{{ url_for('static', filename=user.profile_image or 'default-profile.png') }}" class="profile-img">
-    <h2>@{{ user.display_name or user.username }}</h2>
-    <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
+<div class="profile-card {{ user.template }}"
+     style="font-family: {{ user.font_family }}; color: {{ user.theme_color }};">
+  <img src="{{ url_for('static', filename=user.profile_image or 'default-profile.png') }}"
+       class="profile-img">
+  <h2>@{{ user.display_name or user.username }}</h2>
+  <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
 
-    <div class="links">
-        {% for link in sorted_links %}
-            {% set icon = "" %}
-            {% if "instagram" in link.url %}   {% set icon = "fab fa-instagram" %}
-            {% elif "facebook"  in link.url %}  {% set icon = "fab fa-facebook" %}
-            {% elif "linkedin"  in link.url %}  {% set icon = "fab fa-linkedin" %}
-            {% elif "youtube"   in link.url %}  {% set icon = "fab fa-youtube" %}
-            {% elif "twitter"   in link.url %}  {% set icon = "fab fa-twitter" %}
-            {% elif "snapchat"  in link.url %}  {% set icon = "fab fa-snapchat" %}
-            {% elif "github"    in link.url %}  {% set icon = "fab fa-github" %}
-            {% elif "tiktok"    in link.url %}  {% set icon = "fab fa-tiktok" %}
-            {% elif "spotify.com"     in link.url %}{% set icon = "fab fa-spotify"     %}
-            {% elif "soundcloud.com"  in link.url %}{% set icon = "fab fa-soundcloud"  %}
-            {% elif "vimeo.com"       in link.url %}{% set icon = "fab fa-vimeo-v"     %}
-            {% elif "twitch.tv"       in link.url %}{% set icon = "fab fa-twitch"      %}
-            {% elif "dribbble.com"    in link.url %}{% set icon = "fab fa-dribbble"    %}
-            {% elif "behance.net"     in link.url %}{% set icon = "fab fa-behance"     %}
-            {% elif "medium.com"      in link.url %}{% set icon = "fab fa-medium"      %}
-            {% elif "pinterest.com"   in link.url %}{% set icon = "fab fa-pinterest"   %}
-            {% elif "reddit.com"      in link.url %}{% set icon = "fab fa-reddit"      %}
-            {% elif "tumblr.com"      in link.url %}{% set icon = "fab fa-tumblr"      %}
-            {% elif "whatsapp.com"    in link.url %}{% set icon = "fab fa-whatsapp"    %}
-            {% elif "telegram.me"     in link.url %}{% set icon = "fab fa-telegram"    %}
-            {% elif "slack.com"       in link.url %}{% set icon = "fab fa-slack"       %}
-            {% elif "discord.com"     in link.url %}{% set icon = "fab fa-discord"     %}
-            {% elif "skype.com"       in link.url %}{% set icon = "fab fa-skype"       %}
-            {% elif "mastodon"        in link.url %}{% set icon = "fab fa-mastodon"    %}
-            {% endif %}
-            <a class="link-button {{ user.template }}" href="{{ link.url }}" target="_blank">
-                {% if icon %}<i class="{{ icon }}"></i>{% endif %}
-                {{ link.label }}
-            </a>
-        {% endfor %}
-    </div>
+  <div class="links">
+    {% for link in sorted_links %}
+      {% set icon = "" %}
+      {% if "instagram" in link.url %}   {% set icon = "fab fa-instagram" %}
+      {% elif "facebook"  in link.url %}  {% set icon = "fab fa-facebook" %}
+      {% elif "linkedin"  in link.url %}  {% set icon = "fab fa-linkedin" %}
+      {% elif "youtube"   in link.url %}  {% set icon = "fab fa-youtube" %}
+      {% elif "twitter"   in link.url %}  {% set icon = "fab fa-twitter" %}
+      {% elif "snapchat"  in link.url %}  {% set icon = "fab fa-snapchat" %}
+      {% elif "github"    in link.url %}  {% set icon = "fab fa-github" %}
+      {% elif "tiktok"    in link.url %}  {% set icon = "fab fa-tiktok" %}
+      {% elif "spotify.com"    in link.url %}{% set icon = "fab fa-spotify"    %}
+      {% elif "soundcloud.com" in link.url %}{% set icon = "fab fa-soundcloud" %}
+      {% elif "vimeo.com"      in link.url %}{% set icon = "fab fa-vimeo-v"    %}
+      {% elif "twitch.tv"      in link.url %}{% set icon = "fab fa-twitch"     %}
+      {% elif "dribbble.com"   in link.url %}{% set icon = "fab fa-dribbble"   %}
+      {% elif "behance.net"    in link.url %}{% set icon = "fab fa-behance"    %}
+      {% elif "medium.com"     in link.url %}{% set icon = "fab fa-medium"     %}
+      {% elif "pinterest.com"  in link.url %}{% set icon = "fab fa-pinterest"  %}
+      {% elif "reddit.com"     in link.url %}{% set icon = "fab fa-reddit"     %}
+      {% elif "tumblr.com"     in link.url %}{% set icon = "fab fa-tumblr"     %}
+      {% elif "whatsapp.com"   in link.url %}{% set icon = "fab fa-whatsapp"   %}
+      {% elif "telegram.me"    in link.url %}{% set icon = "fab fa-telegram"   %}
+      {% elif "slack.com"      in link.url %}{% set icon = "fab fa-slack"      %}
+      {% elif "discord.com"    in link.url %}{% set icon = "fab fa-discord"    %}
+      {% elif "skype.com"      in link.url %}{% set icon = "fab fa-skype"      %}
+      {% elif "mastodon"       in link.url %}{% set icon = "fab fa-mastodon"   %}
+      {% endif %}
+      <a class="link-button {{ user.template }}" href="{{ link.url }}" target="_blank">
+        {% if icon %}<i class="{{ icon }}"></i>{% endif %}
+        {{ link.label }}
+      </a>
+    {% endfor %}
+  </div>
+
+    <!--
+      {# Mail-ikon #}
+    {% if current_user.email %}
+      <a href="#" id="edit-email"
+         class="link-button {{ user.template }}">
+        <i class="fas fa-envelope"></i>
+      </a>
+    {% endif %}
+
+    {# Telefon-ikon #}
+    {% if current_user.phone_number %}
+      <a href="#" id="edit-phone"
+         class="link-button {{ user.template }}">
+        <i class="fas fa-phone"></i>
+      </a>
+    {% endif %}
+    -->
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      async function updateField(field) {
+        const current = "{{ getattr(current_user, field) or '' }}";
+        const newVal = prompt("Ange ny " + field.replace('_',' ') + ":", current);
+        if (newVal === null) return;
+        const payload = { [field]: newVal, ["show_" + field]: true };
+        const res = await fetch("{{ url_for('dashboard.update_contact') }}", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          alert("Något gick fel.");
+        }
+      }
+
+      document.getElementById('edit-email').onclick = e => {
+        e.preventDefault();
+        updateField('email');
+      };
+      document.getElementById('edit-phone').onclick = e => {
+        e.preventDefault();
+        updateField('phone_number');
+      };
+    });
+  </script>
 </div>
 {% endblock %}

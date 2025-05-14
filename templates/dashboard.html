@@ -7,7 +7,7 @@
   <div class="dashboard-panel">
     <h2>Välkommen, {{ user.display_name or user.username }}!</h2>
 
-    {# ——— Mobil‐förhandsvisning inbäddad direkt under rubriken ——— #}
+    {# ——— Mobil-förhandsvisning ——— #}
     <div class="mobile-only">
       <div class="mobile-preview {{ user.template }}"
            style="font-family: {{ user.font_family | default('Inter, sans-serif') }};
@@ -21,34 +21,31 @@
           <div class="links" id="preview-links">
             {% for link in sorted_links if link.is_visible %}
               {% set icon = "" %}
-                  {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
-                  {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
-                  {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
-                  {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
-                  {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
-                  {% elif "snapchat" in link.url %}{% set icon = "fab fa-snapchat" %}
-                  {% elif "github" in link.url %}{% set icon = "fab fa-github" %}
-                  {% elif "tiktok" in link.url %}{% set icon = "fab fa-tiktok" %}
-                  {% elif "spotify.com"     in link.url %}{% set icon = "fab fa-spotify"     %}
-                  {% elif "soundcloud.com"  in link.url %}{% set icon = "fab fa-soundcloud"  %}
-                  {% elif "vimeo.com"       in link.url %}{% set icon = "fab fa-vimeo-v"     %}
-                  {% elif "twitch.tv"       in link.url %}{% set icon = "fab fa-twitch"      %}
-                  {% elif "dribbble.com"    in link.url %}{% set icon = "fab fa-dribbble"    %}
-                  {% elif "behance.net"     in link.url %}{% set icon = "fab fa-behance"     %}
-                  {% elif "medium.com"      in link.url %}{% set icon = "fab fa-medium"      %}
-                  {% elif "pinterest.com"   in link.url %}{% set icon = "fab fa-pinterest"   %}
-                  {% elif "reddit.com"      in link.url %}{% set icon = "fab fa-reddit"      %}
-                  {% elif "tumblr.com"      in link.url %}{% set icon = "fab fa-tumblr"      %}
-                  {% elif "whatsapp.com"    in link.url %}{% set icon = "fab fa-whatsapp"    %}
-                  {% elif "telegram.me"     in link.url %}{% set icon = "fab fa-telegram"    %}
-                  {% elif "slack.com"       in link.url %}{% set icon = "fab fa-slack"       %}
-                  {% elif "discord.com"     in link.url %}{% set icon = "fab fa-discord"     %}
-                  {% elif "skype.com"       in link.url %}{% set icon = "fab fa-skype"       %}
-                  {% elif "mastodon"        in link.url %}{% set icon = "fab fa-mastodon"    %}
-                              {% endif %}
+              {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+              {% elif "facebook"   in link.url %}{% set icon = "fab fa-facebook" %}
+              {% elif "linkedin"   in link.url %}{% set icon = "fab fa-linkedin" %}
+              {% elif "youtube"    in link.url %}{% set icon = "fab fa-youtube" %}
+              {% elif "twitter"    in link.url %}{% set icon = "fab fa-twitter" %}
+              {% elif "github"     in link.url %}{% set icon = "fab fa-github" %}
+              {% elif "spotify.com"     in link.url %}{% set icon = "fab fa-spotify"     %}
+              {% elif "soundcloud.com"  in link.url %}{% set icon = "fab fa-soundcloud"  %}
+              {% elif "vimeo.com"       in link.url %}{% set icon = "fab fa-vimeo-v"     %}
+              {% elif "twitch.tv"       in link.url %}{% set icon = "fab fa-twitch"      %}
+              {% elif "dribbble.com"    in link.url %}{% set icon = "fab fa-dribbble"    %}
+              {% elif "behance.net"     in link.url %}{% set icon = "fab fa-behance"     %}
+              {% elif "medium.com"      in link.url %}{% set icon = "fab fa-medium"      %}
+              {% elif "pinterest.com"   in link.url %}{% set icon = "fab fa-pinterest"   %}
+              {% elif "reddit.com"      in link.url %}{% set icon = "fab fa-reddit"      %}
+              {% elif "tumblr.com"      in link.url %}{% set icon = "fab fa-tumblr"      %}
+              {% elif "whatsapp.com"    in link.url %}{% set icon = "fab fa-whatsapp"    %}
+              {% elif "telegram.me"     in link.url %}{% set icon = "fab fa-telegram"    %}
+              {% elif "slack.com"       in link.url %}{% set icon = "fab fa-slack"       %}
+              {% elif "discord.com"     in link.url %}{% set icon = "fab fa-discord"     %}
+              {% elif "skype.com"       in link.url %}{% set icon = "fab fa-skype"       %}
+              {% elif "mastodon"        in link.url %}{% set icon = "fab fa-mastodon"    %}
+              {% endif %}
               <a class="link-button {{ user.template }}"
-                 href="#"
-                 onclick="return false;">
+                 href="#" onclick="return false;">
                 {% if icon %}<i class="{{ icon }}"></i>{% endif %} {{ link.label }}
               </a>
             {% endfor %}
@@ -57,21 +54,35 @@
       </div>
     </div>
 
-    {# ——— Desktop‐profilkort ——— #}
-    <div class="profile-card desktop-only">
+    {# ——— Desktop-profilkort ——— #}
+    <div class="profile-card desktop-only"
+         style="font-family: {{ user.font_family | default('Inter, sans-serif') }};
+                color: {{ user.theme_color or '#333' }};">
       <img src="{{ url_for('static', filename=user.profile_image or 'default-profile.png') }}"
            class="profile-img">
       <h3>@{{ user.display_name or user.username }}</h3>
       <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
+
+      {# ——— Kontakt-ikoner som öppnar pop-ups ——— #}
+      <div class="contact-icons">
+        <button id="openEmailModal" class="small-icon-btn">
+          <i class="fas fa-envelope"></i>
+        </button>
+        <button id="openPhoneModal" class="small-icon-btn">
+          <i class="fas fa-phone"></i>
+        </button>
+      </div>
     </div>
 
-    <button id="openModal" class="btn action-btn">➕ Lägg till</button>
 
-    <div id="addModal" class="modal" style="display:none;">
+
+    {# ——— Lägg till-knapp & modal för nya länkar ——— #}
+    <button id="openModal" class="btn action-btn">➕ Lägg till</button>
+    <div id="addModal" class="modal">
       <div class="modal-content">
         <span class="close" id="closeModal">&times;</span>
         <h3>Lägg till länk</h3>
-        <form method="POST">
+        <form method="POST" action="{{ url_for('dashboard.dashboard_view') }}">
           <input name="label" placeholder="Titel (t.ex. LinkedIn)" required>
           <input name="url" placeholder="https://dinsida.com" required>
           <button type="submit">Spara</button>
@@ -79,31 +90,46 @@
       </div>
     </div>
 
+    {# ——— Lista med befintliga länkar ——— #}
     <div id="link-list" class="links">
       {% for link in sorted_links %}
         {% set icon = "" %}
-            {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
-            {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
-            {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
-            {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
-            {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
-            {% elif "snapchat" in link.url %}{% set icon = "fab fa-snapchat" %}
-            {% elif "github" in link.url %}{% set icon = "fab fa-github" %}
-            {% elif "tiktok" in link.url %}{% set icon = "fab fa-tiktok" %}
-            {% endif %}
-
+        {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+          {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
+          {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
+          {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
+          {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
+          {% elif "snapchat" in link.url %}{% set icon = "fab fa-snapchat" %}
+          {% elif "github" in link.url %}{% set icon = "fab fa-github" %}
+          {% elif "tiktok" in link.url %}{% set icon = "fab fa-tiktok" %}
+          {% elif "spotify.com"     in link.url %}{% set icon = "fab fa-spotify"     %}
+          {% elif "soundcloud.com"  in link.url %}{% set icon = "fab fa-soundcloud"  %}
+          {% elif "vimeo.com"       in link.url %}{% set icon = "fab fa-vimeo-v"     %}
+          {% elif "twitch.tv"       in link.url %}{% set icon = "fab fa-twitch"      %}
+          {% elif "dribbble.com"    in link.url %}{% set icon = "fab fa-dribbble"    %}
+          {% elif "behance.net"     in link.url %}{% set icon = "fab fa-behance"     %}
+          {% elif "medium.com"      in link.url %}{% set icon = "fab fa-medium"      %}
+          {% elif "pinterest.com"   in link.url %}{% set icon = "fab fa-pinterest"   %}
+          {% elif "reddit.com"      in link.url %}{% set icon = "fab fa-reddit"      %}
+          {% elif "tumblr.com"      in link.url %}{% set icon = "fab fa-tumblr"      %}
+          {% elif "whatsapp.com"    in link.url %}{% set icon = "fab fa-whatsapp"    %}
+          {% elif "telegram.me"     in link.url %}{% set icon = "fab fa-telegram"    %}
+          {% elif "slack.com"       in link.url %}{% set icon = "fab fa-slack"       %}
+          {% elif "discord.com"     in link.url %}{% set icon = "fab fa-discord"     %}
+          {% elif "skype.com"       in link.url %}{% set icon = "fab fa-skype"       %}
+          {% elif "mastodon"        in link.url %}{% set icon = "fab fa-mastodon"    %}
+        {% endif %}
         <div class="link-card"
              data-id="{{ link.id }}"
              data-label="{{ link.label }}"
              data-url="{{ link.url }}"
              data-icon="{{ icon }}"
              data-visible="{{ link.is_visible }}">
-          <form class="edit-link-form" style="display: none;">
+          <form class="edit-link-form" style="display:none;">
             <input type="text" name="label" value="{{ link.label }}" required>
             <input type="url" name="url" value="{{ link.url }}" required>
             <button type="submit">📂</button>
           </form>
-
           <div class="link-main">
             <div class="link-info">
               {% if icon %}<i class="{{ icon }}"></i>{% endif %}
@@ -112,7 +138,7 @@
             <div class="link-actions">
               <form method="POST"
                     action="{{ url_for('dashboard.toggle_link_visibility', link_id=link.id) }}">
-                <button type="submit" class="link-btn" title="Visa/dölj länk">
+                <button type="submit" class="link-btn">
                   {% if link.is_visible %}👁️{% else %}❌{% endif %}
                 </button>
               </form>
@@ -126,7 +152,7 @@
     </div>
   </div>
 
-  <!-- 📱 FÖRHANDSVISNING TILL HÖGER – visas ENBART på desktop -->
+  <!-- 📱 Förhandsvisning till höger (desktop) -->
   <div class="preview-panel desktop-only">
     <div class="mobile-preview {{ user.template }}"
          style="font-family: {{ user.font_family | default('Inter, sans-serif') }};
@@ -137,10 +163,19 @@
              class="profile-img">
         <h3>@{{ user.display_name or user.username }}</h3>
         <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
+         {# ——— Kontakt-ikoner även i mobilförhandsvisningen ——— #}
+        <div class="contact-icons">
+          <button id="openEmailModalMobile" class="small-icon-btn">
+            <i class="fas fa-envelope"></i>
+         </button>
+          <button id="openPhoneModalMobile" class="small-icon-btn">
+            <i class="fas fa-phone"></i>
+          </button>
+        </div>
         <div class="links" id="preview-links">
           {% for link in sorted_links if link.is_visible %}
             {% set icon = "" %}
-              {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
+            {% if "instagram" in link.url %}{% set icon = "fab fa-instagram" %}
               {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
               {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
               {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
@@ -148,10 +183,24 @@
               {% elif "snapchat" in link.url %}{% set icon = "fab fa-snapchat" %}
               {% elif "github" in link.url %}{% set icon = "fab fa-github" %}
               {% elif "tiktok" in link.url %}{% set icon = "fab fa-tiktok" %}
-              {% endif %}
-            <a class="link-button {{ user.template }}"
-               href="#"
-               onclick="return false;">
+              {% elif "spotify.com"     in link.url %}{% set icon = "fab fa-spotify"     %}
+              {% elif "soundcloud.com"  in link.url %}{% set icon = "fab fa-soundcloud"  %}
+              {% elif "vimeo.com"       in link.url %}{% set icon = "fab fa-vimeo-v"     %}
+              {% elif "twitch.tv"       in link.url %}{% set icon = "fab fa-twitch"      %}
+              {% elif "dribbble.com"    in link.url %}{% set icon = "fab fa-dribbble"    %}
+              {% elif "behance.net"     in link.url %}{% set icon = "fab fa-behance"     %}
+              {% elif "medium.com"      in link.url %}{% set icon = "fab fa-medium"      %}
+              {% elif "pinterest.com"   in link.url %}{% set icon = "fab fa-pinterest"   %}
+              {% elif "reddit.com"      in link.url %}{% set icon = "fab fa-reddit"      %}
+              {% elif "tumblr.com"      in link.url %}{% set icon = "fab fa-tumblr"      %}
+              {% elif "whatsapp.com"    in link.url %}{% set icon = "fab fa-whatsapp"    %}
+              {% elif "telegram.me"     in link.url %}{% set icon = "fab fa-telegram"    %}
+              {% elif "slack.com"       in link.url %}{% set icon = "fab fa-slack"       %}
+              {% elif "discord.com"     in link.url %}{% set icon = "fab fa-discord"     %}
+              {% elif "skype.com"       in link.url %}{% set icon = "fab fa-skype"       %}
+              {% elif "mastodon"        in link.url %}{% set icon = "fab fa-mastodon"    %}
+            {% endif %}
+            <a class="link-button {{ user.template }}" href="#" onclick="return false;">
               {% if icon %}<i class="{{ icon }}"></i>{% endif %} {{ link.label }}
             </a>
           {% endfor %}
@@ -161,82 +210,100 @@
   </div>
 </div>
 
-<style>
-  /* ——— Mobile (≤600px): göm desktop‐kortet och preview-panelen längst till höger ——— */
-  @media (max-width: 600px) {
-    .desktop-only  { display: none !important; }
-    .mobile-only   { display: block !important; }
-    .preview-panel { display: none !important; }
+{# ——— E-post Pop-up ——— #}
+<div id="emailModal" class="modal">
+  <div class="modal-content">
+    <button type="button" class="modal-close">&times;</button>
+    <h3>Redigera e-post</h3>
+    <input type="email" id="modalEmail" value="{{ user.email or '' }}" placeholder="E-post"/><br/>
+    <label>
+      <input type="checkbox" id="modalShowEmail" {% if user.show_email %}checked{% endif %}/>
+      Visa e-post offentligt
+    </label><br/>
+    <button id="saveEmail" class="btn-primary">Spara</button>
+  </div>
+</div>
 
-    /* << VÅR NYA CENTRERINGSREGEL >> */
-    .mobile-only {
-      display: flex !important;
-      justify-content: center;
-    }
+{# ——— Telefon Pop-up ——— #}
+<div id="phoneModal" class="modal">
+  <div class="modal-content">
+    <button type="button" class="modal-close">&times;</button>
+    <h3>Redigera telefon</h3>
+    <input type="tel" id="modalPhone" value="{{ user.phone_number or '' }}" placeholder="Telefonnummer"/><br/>
+    <label>
+      <input type="checkbox" id="modalShowPhone" {% if user.show_phone %}checked{% endif %}/>
+      Visa telefonnummer offentligt
+    </label><br/>
+    <button id="savePhone" class="btn-primary">Spara</button>
+  </div>
+</div>
+
+<style>
+  /* Responsivt */
+  @media (max-width:600px){ .desktop-only{display:none!important;} .mobile-only{display:flex!important;justify-content:center;} .preview-panel{display:none!important;} }
+  @media (min-width:601px){ .mobile-only{display:none!important;} .desktop-only{display:block!important;} .preview-panel{display:block!important;} }
+
+  /* Ikon-knappar horisontellt */
+  .contact-icons{ display:flex; gap:1rem; justify-content:center; margin:1rem 0; }
+  .small-icon-btn{ background:none!important; border:none!important; box-shadow:none!important; padding:.5rem!important; width:auto!important; font-size:1.5rem; cursor:pointer; color: #000!important;}
+
+  /* Modal */
+  .modal{ display:none; position:fixed;top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,.5); align-items:center; justify-content:center; z-index:1000; }
+  .modal.active{ display:flex; }
+  .modal-content{ background:#fff; padding:1.5rem; border-radius:8px; width:90%;max-width:360px; position:relative; }
+  .modal-close{ position:absolute;top:.5rem;right:.5rem; background:none;border:none;font-size:1.25rem;cursor:pointer; }
+
+    /* Gör “×”-knappen liten, svart och utan blå bakgrund */
+  .modal-close {
+    all: unset;             /* tar bort alla tidigare stilar */
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1.25rem;     /* lagom storlek på krysset */
+    color: #000;            /* svart */
+    cursor: pointer;
+
   }
-  /* ——— Desktop (≥601px): göm det inbäddade mobilen, visa allt annat ——— */
-  @media (min-width: 601px) {
-    .mobile-only   { display: none !important; }
-    .desktop-only  { display: block !important; }
-    .preview-panel { display: block !important; }
-  }
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
-  // Sortable + redigering + modal-skript oförändrat...
-  const el = document.getElementById('link-list');
-  const previewLinks = document.getElementById('preview-links');
-  new Sortable(el, {
-    animation: 150,
-    onEnd() {
-      const order = [...el.children].map(r => r.dataset.id);
-      fetch('/update_order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ order })
-      }).then(() => {
-        previewLinks.innerHTML = '';
-        [...el.children].filter(r => r.dataset.visible==='True')
-          .forEach(r => {
-            const a = document.createElement('a');
-            a.className = `link-button {{ user.template }}`;
-            a.href = "#"; a.onclick = ()=>false;
-            a.innerHTML = r.dataset.icon
-              ? `<i class="${r.dataset.icon}"></i> ${r.dataset.label}`
-              : r.dataset.label;
-            previewLinks.appendChild(a);
-          });
+document.addEventListener('DOMContentLoaded',()=>{
+  // Sortable + inline-edit…
+
+  // Pop-up binds
+  function bindPop(btnId,modalId,saveId,field,showField){
+    const btn   = document.getElementById(btnId),
+          modal = document.getElementById(modalId),
+          close = modal.querySelector('.modal-close'),
+          save  = document.getElementById(saveId);
+    btn.onclick   = ()=>modal.classList.add('active');
+    close.onclick = ()=>modal.classList.remove('active');
+    window.onclick= e=>{if(e.target===modal)modal.classList.remove('active');};
+    save.onclick  = async ()=>{
+      const val = document.getElementById(field==='email'?'modalEmail':'modalPhone').value;
+      const vis = document.getElementById(showField==='show_email'?'modalShowEmail':'modalShowPhone').checked;
+      const payload={};payload[field]=val;payload[showField]=vis;
+      const res = await fetch("{{ url_for('dashboard.update_contact') }}",{
+        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
       });
-    }
-  });
+      if(res.ok)location.reload();else alert('Något gick fel');
+    };
+  }
+  bindPop('openEmailModal','emailModal','saveEmail','email','show_email');
+  bindPop('openPhoneModal','phoneModal','savePhone','phone_number','show_phone');
 
-  document.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.preventDefault();
-      const card = btn.closest('.link-card');
-      card.querySelector('.edit-link-form').style.display = 'flex';
-      card.querySelector('.link-main').style.display = 'none';
-    });
-  });
-  document.querySelectorAll('.edit-link-form').forEach(form => {
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const card = form.closest('.link-card');
-      const id = card.dataset.id;
-      fetch(`/edit_link_inline/${id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          label: form.label.value, url: form.url.value
-        })
-      }).then(() => location.reload());
-    });
-  });
 
-  const modal = document.getElementById("addModal");
-  document.getElementById("openModal").onclick = () => modal.style.display = "flex";
-  document.getElementById("closeModal").onclick = () => modal.style.display = "none";
-  window.onclick = e => { if (e.target==modal) modal.style.display="none"; };
+  // Lägg till-modal
+  const addModal=document.getElementById('addModal');
+  document.getElementById('openModal').onclick=()=>addModal.classList.add('active');
+  document.getElementById('closeModal').onclick=()=>addModal.classList.remove('active');
+  window.addEventListener('click',e=>{ if(e.target===addModal) addModal.classList.remove('active'); });
+
+  initModal('openEmailModalMobile','emailModal','emailForm');
+  initModal('openPhoneModalMobile','phoneModal','phoneForm');
+
+});
 </script>
 {% endblock %}

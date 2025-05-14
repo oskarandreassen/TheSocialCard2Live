@@ -1,13 +1,29 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
 from flask_login import login_required, current_user
 from models import db, Link
+from forms import ProfileForm
+from flask import flash
+
 
 dashboard = Blueprint('dashboard', __name__)
 
 @dashboard.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard_view():
-    if request.method == 'POST':
+    # Initiera kontaktformuläret med befintliga värden
+    form = ProfileForm(obj=current_user)
+    if form.validate_on_submit():
+        # Spara e-post och telefon på användaren
+        current_user.email        = form.email.data
+        current_user.show_email   = form.show_email.data
+        current_user.phone_number = form.phone_number.data
+        current_user.show_phone   = form.show_phone.data
+        db.session.commit()
+        flash("Din kontaktinfo är uppdaterad!", "success")
+        return redirect(url_for('dashboard.dashboard_view'))
+
+    # Hantera tillägg av länk
+    if request.method == 'POST' and 'label' in request.form:
         label = request.form['label']
         url = request.form['url']
         position = len(current_user.links)
@@ -15,14 +31,40 @@ def dashboard_view():
         db.session.add(new_link)
         db.session.commit()
 
-    sorted_links = Link.query.filter_by(user_id=current_user.id).order_by(Link.position).all()
-    return render_template('dashboard.html', user=current_user, sorted_links=sorted_links)
+    # Hämta ordnade länkar för visning
+    sorted_links = Link.query.filter_by(user_id=current_user.id) \
+                             .order_by(Link.position).all()
 
-@dashboard.route('/profile')
+    return render_template(
+        'dashboard.html',
+        user=current_user,
+        sorted_links=sorted_links,
+        form=form
+    )
+
+
+@dashboard.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    sorted_links = Link.query.filter_by(user_id=current_user.id).order_by(Link.position).all()
-    return render_template('profile.html', user=current_user, sorted_links=sorted_links)
+    form = ProfileForm(obj=current_user)
+    if form.validate_on_submit():
+        # Spara formulärdata på current_user
+        current_user.email        = form.email.data
+        current_user.show_email   = form.show_email.data
+        current_user.phone_number = form.phone_number.data
+        current_user.show_phone   = form.show_phone.data
+        db.session.commit()
+        flash("Din kontaktinfo är uppdaterad!", "success")
+        return redirect(url_for('dashboard.profile'))
+
+    # Hämta länkar också om du vill visa i profilen
+    sorted_links = Link.query.filter_by(user_id=current_user.id)\
+                             .order_by(Link.position).all()
+
+    return render_template('profile.html',
+                           user=current_user,
+                           sorted_links=sorted_links,
+                           form=form)
 
 @dashboard.route('/edit_link_inline/<int:link_id>', methods=['POST'])
 @login_required
@@ -33,7 +75,7 @@ def edit_link_inline(link_id):
 
     data = request.get_json()
     link.label = data.get('label', link.label)
-    link.url = data.get('url', link.url)
+    link.url   = data.get('url', link.url)
     db.session.commit()
     return '', 204
 
@@ -68,3 +110,16 @@ def toggle_link_visibility(link_id):
     db.session.commit()
     return redirect(url_for('dashboard.dashboard_view'))
 
+@dashboard.route('/update_contact', methods=['POST'])
+@login_required
+def update_contact():
+    data = request.get_json() or {}
+    # Observera: vi lyssnar på fältnamn 'email' och 'phone_number'
+    if 'email' in data:
+        current_user.email      = data['email']
+        current_user.show_email = data.get('show_email', True)
+    if 'phone_number' in data:
+        current_user.phone_number = data['phone_number']
+        current_user.show_phone   = data.get('show_phone', True)
+    db.session.commit()
+    return jsonify(success=True)

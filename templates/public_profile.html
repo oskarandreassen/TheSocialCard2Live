@@ -93,18 +93,52 @@ body {
     <h2>@{{ user.display_name or user.username }}</h2>
     <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
 
+
+      {# ——— Kontakt-ikoner på publika profilen ——— #}
+  <div class="contact-icons">
+    {% if user.show_email and user.email %}
+      <a href="mailto:{{ user.email }}" class="small-icon-btn" title="E-post">
+        <i class="fas fa-envelope"></i>
+      </a>
+    {% endif %}
+    {% if user.show_phone and user.phone_number %}
+      <a href="tel:{{ user.phone_number|replace(' ', '') }}" class="small-icon-btn" title="Telefonnummer">
+        <i class="fas fa-phone"></i>
+      </a>
+    {% endif %}
+  </div>
+
+
+
     {% set visible_links = links | selectattr('is_visible') | list %}
     {% if visible_links %}
       <div class="links">
       {% for link in visible_links %}
         {% set icon = "" %}
         {% if "instagram.com"   in link.url %}{% set icon = "fab fa-instagram"   %}
-        {% elif "facebook.com"  in link.url %}{% set icon = "fab fa-facebook"    %}
-        {% elif "linkedin.com"  in link.url %}{% set icon = "fab fa-linkedin"    %}
-        {% elif "youtube.com"   in link.url %}{% set icon = "fab fa-youtube"     %}
-        {% elif "twitter.com"   in link.url %}{% set icon = "fab fa-twitter"     %}
-        {% elif "tiktok.com"    in link.url %}{% set icon = "fab fa-tiktok"      %}
-        {% elif "github.com"    in link.url %}{% set icon = "fab fa-github"      %}
+        {% elif "facebook" in link.url %}{% set icon = "fab fa-facebook" %}
+        {% elif "linkedin" in link.url %}{% set icon = "fab fa-linkedin" %}
+        {% elif "youtube" in link.url %}{% set icon = "fab fa-youtube" %}
+        {% elif "twitter" in link.url %}{% set icon = "fab fa-twitter" %}
+        {% elif "snapchat" in link.url %}{% set icon = "fab fa-snapchat" %}
+        {% elif "github" in link.url %}{% set icon = "fab fa-github" %}
+        {% elif "tiktok" in link.url %}{% set icon = "fab fa-tiktok" %}
+        {% elif "spotify.com"     in link.url %}{% set icon = "fab fa-spotify"     %}
+        {% elif "soundcloud.com"  in link.url %}{% set icon = "fab fa-soundcloud"  %}
+        {% elif "vimeo.com"       in link.url %}{% set icon = "fab fa-vimeo-v"     %}
+        {% elif "twitch.tv"       in link.url %}{% set icon = "fab fa-twitch"      %}
+        {% elif "dribbble.com"    in link.url %}{% set icon = "fab fa-dribbble"    %}
+        {% elif "behance.net"     in link.url %}{% set icon = "fab fa-behance"     %}
+        {% elif "medium.com"      in link.url %}{% set icon = "fab fa-medium"      %}
+        {% elif "pinterest.com"   in link.url %}{% set icon = "fab fa-pinterest"   %}
+        {% elif "reddit.com"      in link.url %}{% set icon = "fab fa-reddit"      %}
+        {% elif "tumblr.com"      in link.url %}{% set icon = "fab fa-tumblr"      %}
+        {% elif "whatsapp.com"    in link.url %}{% set icon = "fab fa-whatsapp"    %}
+        {% elif "telegram.me"     in link.url %}{% set icon = "fab fa-telegram"    %}
+        {% elif "slack.com"       in link.url %}{% set icon = "fab fa-slack"       %}
+        {% elif "discord.com"     in link.url %}{% set icon = "fab fa-discord"     %}
+        {% elif "skype.com"       in link.url %}{% set icon = "fab fa-skype"       %}
+        {% elif "mastodon"        in link.url %}{% set icon = "fab fa-mastodon"    %}
         {% endif %}
 
         <a class="link-button {{ user.template }}" href="{{ link.url }}" target="_blank">

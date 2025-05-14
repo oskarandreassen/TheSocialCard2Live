@@ -83,6 +83,15 @@
              class="profile-img">
         <h3>@{{ user.display_name or user.username }}</h3>
         <p id="previewBio">{{ user.bio or "Ingen beskrivning ännu." }}</p>
+                 {# ——— Kontakt-ikoner även i mobilförhandsvisningen ——— #}
+        <div class="contact-icons">
+          <button id="openEmailModalMobile" class="small-icon-btn">
+            <i class="fas fa-envelope"></i>
+         </button>
+          <button id="openPhoneModalMobile" class="small-icon-btn">
+            <i class="fas fa-phone"></i>
+          </button>
+        </div>
 
         {% if visible_links %}
         <div class="links" id="previewLinks-{{ preview_side }}">

@@ -108,6 +108,24 @@
     max-width: 100%;
   }
 
+  .contact-icons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1rem 0;
+}
+.small-icon-btn {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: .5rem !important;
+  width: auto !important;
+  font-size: 1.5rem;
+  color: #000;      /* eller vitt, beroende på tema */
+  cursor: pointer;
+}
+
+
   /* ─── 5) Centrera inställnings-layout ─────────────────────────────── */
   .settings-layout.right-preview {
     display: flex !important;

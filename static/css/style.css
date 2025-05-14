@@ -440,7 +440,7 @@ body.rainbow { background: linear-gradient(90deg,red,orange,yellow,green,blue,in
 .public-profile p {
   margin-top: 4px;
   font-size: 0.95rem;
-  opacity: 0.9;
+  opacity: 0.8;
 }
 
 .public-profile .links {
@@ -448,6 +448,17 @@ body.rainbow { background: linear-gradient(90deg,red,orange,yellow,green,blue,in
   flex-direction: column;
   gap: 12px;
   margin-top: 20px;
+  box-sizing: border-box;
+
+}
+
+
+.public-profile .links .link-button {
+  display: block;            /* eller inline-block om du vill flera i rad */
+  width: 90% !important;    /* åsidosätt global width:100% */
+  max-width: 100%;           /* aldrig större än sin förälder */
+  box-sizing: border-box;    /* inkludera paddning i breddberäkningen */
+  margin: 0.25rem auto;      /* lite mellanrum top/botten, centrerad */
 }
 
 /* ==========================================================================
@@ -500,4 +511,31 @@ body.rainbow { background: linear-gradient(90deg,red,orange,yellow,green,blue,in
 
 .modal .close:hover {
   transform: scale(1.1);
+}
+
+
+/* ==========================================================================
+   Contact-icon overrides (applies on desktop & mobile)
+   ========================================================================== */
+.contact-icons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.small-icon-btn {
+  /* override the global button width:100% */
+  width: auto !important;
+  padding: 0.25rem !important;     /* tiny clickable area around the icon */
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 1.5rem;
+  color: #000;                     /* black icons */
+  cursor: pointer;
+}
+
+.small-icon-btn i {
+  pointer-events: none;            /* let clicks bubble to the button */
 }

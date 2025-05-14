@@ -16,6 +16,10 @@ class User(db.Model, UserMixin):
     links = db.relationship('Link', backref='user')
     show_links = db.Column(db.Boolean, default=True)
     is_visible = db.Column(db.Boolean, default=True)
+    email         = db.Column(db.String(120), nullable=True)
+    show_email    = db.Column(db.Boolean, default=False)
+    phone_number  = db.Column(db.String(20),  nullable=True)
+    show_phone    = db.Column(db.Boolean, default=False)
 
 
 class Link(db.Model):
