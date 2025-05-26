@@ -1,10 +1,20 @@
 # views/auth_routes.py
+from flask import session
+from app import mail
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
-from forms import RegisterForm, LoginForm
-from flask import session
+from flask_mail import Message
+from datetime import datetime        # ← Lägg till den här raden
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_
+
+from flask import session, Blueprint, render_template, redirect, url_for, flash, request
+from flask_login import login_user, logout_user, current_user
+from forms import RegisterForm, LoginForm, SetupEmailForm
+
+
 
 
 auth = Blueprint('auth', __name__)
@@ -13,35 +23,128 @@ auth = Blueprint('auth', __name__)
 def home():
     return redirect(url_for('auth.login'))
 
-@auth.route('/register', methods=['GET', 'POST'])
+@auth.route('/register', methods=['GET','POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-
-        # Kontrollera att användarnamnet inte finns
-        if User.query.filter_by(username=username).first():
+        # 1) Kolla både username och email
+        existing_user = User.query.filter_by(username=form.username.data).first()
+        existing_email= User.query.filter_by(email=form.email.data).first()
+        if existing_user:
             flash("Användarnamnet finns redan.", "warning")
             return redirect(url_for('auth.register'))
+        if existing_email:
+            flash("Den här e-postadressen är redan registrerad.", "warning")
+            return redirect(url_for('auth.register'))
 
-        # Skapa användare
-        hashed_pw = generate_password_hash(password)
-        new_user = User(username=username, password=hashed_pw)
+        # 2) Skapa användare + generera token, skicka mail …
+        new_user = User(
+            username=form.username.data,
+            email=form.email.data,
+            password=generate_password_hash(form.password.data)
+        )
+        # … om du vill göra email-confirmation:
+        token = new_user.generate_email_token()
+        new_user.email_token = token
         db.session.add(new_user)
         db.session.commit()
 
-        flash("Konto skapat! Logga in nedan.", "success")
+        # Skicka bekräftelsemail
+        link = url_for('auth.confirm_email', token=token, _external=True)
+        msg = Message("Bekräfta din e-post", recipients=[new_user.email])
+        msg.body = f"Välkommen! Klicka här för att aktivera ditt konto:\n\n{link}"
+        mail.send(msg)
+
+        flash("En aktiveringslänk har skickats till din e-post.", "info")
         return redirect(url_for('auth.login'))
 
     return render_template('register.html', form=form)
+
+
+@auth.route('/resend-confirm', methods=['POST'])
+def resend_confirm():
+    email = request.form.get('email')  # eller från ett dolt fält i inloggningsformuläret
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash("Vi hittar inget konto med den e-postadressen.", "warning")
+        return redirect(url_for('auth.login'))
+
+    if user.email_confirmed:
+        flash("Din e-post är redan bekräftad. Logga in istället.", "info")
+        return redirect(url_for('auth.login'))
+
+    # Skapa ny token och skicka
+    token = user.generate_email_token()
+    db.session.commit()
+    link = url_for('auth.confirm_email', token=token, _external=True)
+    msg = Message("Bekräfta din e-post", recipients=[user.email])
+    msg.body = f"Klicka här för att aktivera ditt konto:\n\n{link}"
+    mail.send(msg)
+
+    flash("Ny bekräftelselänk skickad till din e-post.", "success")
+    return redirect(url_for('auth.login'))
+
+@auth.route('/setup-email', methods=['GET', 'POST'])
+def setup_email():
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    if current_user.email_confirmed:
+        return redirect(url_for('dashboard.dashboard_view'))
+
+    form = SetupEmailForm()
+    if form.validate_on_submit():
+        # Spara både e-post och token i samma commit
+        current_user.email = form.email.data
+        token = current_user.generate_email_token()
+        db.session.commit()
+
+        # Skicka bekräftelse-mail
+        link = url_for('auth.confirm_email', token=token, _external=True)
+        msg = Message("Bekräfta din e-post", recipients=[current_user.email])
+        msg.body = f"Klicka här för att bekräfta ditt konto:\n\n{link}"
+        mail.send(msg)
+
+        flash("E-post sparad – kolla din inkorg för bekräftelselänk.", "success")
+        return redirect(url_for('auth.login'))
+
+    return render_template('setup_email.html', form=form)
+
+
+
+
+@auth.route('/confirm/<token>')
+def confirm_email(token):
+    user = User.query.filter_by(email_token=token).first_or_404()
+    user.email_confirmed = True
+    user.email_token = None
+    db.session.commit()
+    flash("Din e-post är nu bekräftad! Du kan nu logga in.", "success")
+    return redirect(url_for('auth.login'))
+
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        # hitta via username eller email som vi tidigare la in
+        user = User.query.filter(
+            or_(User.username == form.username.data,
+                User.email    == form.username.data)
+        ).first()
+
         if user and check_password_hash(user.password, form.password.data):
+            # om konto utan email alls
+            if not user.email:
+                login_user(user)
+                return redirect(url_for('auth.setup_email'))
+
+            # om email finns men inte bekräftad
+            if not user.email_confirmed:
+                login_user(user)  # logga in ändå, så current_user blir satt
+                return redirect(url_for('auth.setup_email'))
+
+            # annars: helt normalt inlogg
             login_user(user, remember=True)
             session.permanent = True
             return redirect(url_for('dashboard.dashboard_view'))
@@ -49,6 +152,8 @@ def login():
         flash("Fel användarnamn eller lösenord.", "danger")
 
     return render_template('login.html', form=form)
+
+
 
 @auth.route('/logout')
 def logout():

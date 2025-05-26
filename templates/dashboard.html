@@ -18,6 +18,19 @@
                class="profile-img">
           <h3>@{{ user.display_name or user.username }}</h3>
           <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
+           <!-- ——— Kontakt-ikoner även i mobil-vyn ——— -->
+          <div class="contact-icons">
+          {% if user.show_email %}
+            <a href="mailto:{{ user.email }}" class="small-icon-btn">
+              <i class="fas fa-envelope"></i>
+            </a>
+          {% endif %}
+          {% if user.show_phone %}
+            <a href="tel:{{ user.phone_number }}" class="small-icon-btn">
+              <i class="fas fa-phone"></i>
+            </a>
+          {% endif %}
+        </div>
           <div class="links" id="preview-links">
             {% for link in sorted_links if link.is_visible %}
               {% set icon = "" %}
@@ -73,6 +86,17 @@
         </button>
       </div>
     </div>
+
+        <!-- ——— Redigera kontakt (endast mobil) ——— -->
+      <div class="contact-icons mobile-only">
+        <button id="openEmailModalMobile" class="small-icon-btn">
+          <i class="fas fa-envelope"></i>
+        </button>
+        <button id="openPhoneModalMobile" class="small-icon-btn">
+          <i class="fas fa-phone"></i>
+        </button>
+      </div>
+
 
 
 
@@ -164,13 +188,17 @@
         <h3>@{{ user.display_name or user.username }}</h3>
         <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
          {# ——— Kontakt-ikoner även i mobilförhandsvisningen ——— #}
-        <div class="contact-icons">
-          <button id="openEmailModalMobile" class="small-icon-btn">
-            <i class="fas fa-envelope"></i>
-         </button>
-          <button id="openPhoneModalMobile" class="small-icon-btn">
-            <i class="fas fa-phone"></i>
-          </button>
+                <div class="contact-icons">
+          {% if user.show_email %}
+            <a href="mailto:{{ user.email }}" class="small-icon-btn">
+              <i class="fas fa-envelope"></i>
+            </a>
+          {% endif %}
+          {% if user.show_phone %}
+            <a href="tel:{{ user.phone_number }}" class="small-icon-btn">
+              <i class="fas fa-phone"></i>
+            </a>
+          {% endif %}
         </div>
         <div class="links" id="preview-links">
           {% for link in sorted_links if link.is_visible %}
@@ -269,41 +297,60 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded', () => {
   // Sortable + inline-edit…
 
   // Pop-up binds
-  function bindPop(btnId,modalId,saveId,field,showField){
+  function bindPop(btnId, modalId, saveId, field, showField) {
     const btn   = document.getElementById(btnId),
           modal = document.getElementById(modalId),
           close = modal.querySelector('.modal-close'),
           save  = document.getElementById(saveId);
-    btn.onclick   = ()=>modal.classList.add('active');
-    close.onclick = ()=>modal.classList.remove('active');
-    window.onclick= e=>{if(e.target===modal)modal.classList.remove('active');};
-    save.onclick  = async ()=>{
-      const val = document.getElementById(field==='email'?'modalEmail':'modalPhone').value;
-      const vis = document.getElementById(showField==='show_email'?'modalShowEmail':'modalShowPhone').checked;
-      const payload={};payload[field]=val;payload[showField]=vis;
-      const res = await fetch("{{ url_for('dashboard.update_contact') }}",{
-        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+
+    btn.onclick    = () => modal.classList.add('active');
+    close.onclick  = () => modal.classList.remove('active');
+    window.onclick = e => { if (e.target === modal) modal.classList.remove('active'); };
+
+    save.onclick = async () => {
+      const val = document.getElementById(field === 'email' ? 'modalEmail' : 'modalPhone').value;
+      const vis = document.getElementById(showField === 'show_email' ? 'modalShowEmail' : 'modalShowPhone').checked;
+      const payload = {};
+      payload[field]     = val;
+      payload[showField] = vis;
+
+      const res = await fetch("{{ url_for('dashboard.update_contact') }}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
-      if(res.ok)location.reload();else alert('Något gick fel');
+
+      if (res.ok) {
+        location.reload();
+      } else {
+        alert('Något gick fel');
+      }
     };
   }
-  bindPop('openEmailModal','emailModal','saveEmail','email','show_email');
-  bindPop('openPhoneModal','phoneModal','savePhone','phone_number','show_phone');
+
+  // Bind only the actual edit buttons (desktop + mobile share same IDs)
+  bindPop('openEmailModal', 'emailModal', 'saveEmail',       'email',        'show_email');
+  bindPop('openPhoneModal', 'phoneModal', 'savePhone',       'phone_number', 'show_phone');
+
+  // Mobila edit-knappar
+bindPop('openEmailModalMobile', 'emailModal','saveEmail',    'email',        'show_email');
+bindPop('openPhoneModalMobile', 'phoneModal','savePhone',    'phone_number', 'show_phone');
 
 
   // Lägg till-modal
-  const addModal=document.getElementById('addModal');
-  document.getElementById('openModal').onclick=()=>addModal.classList.add('active');
-  document.getElementById('closeModal').onclick=()=>addModal.classList.remove('active');
-  window.addEventListener('click',e=>{ if(e.target===addModal) addModal.classList.remove('active'); });
-
-  initModal('openEmailModalMobile','emailModal','emailForm');
-  initModal('openPhoneModalMobile','phoneModal','phoneForm');
-
+  const addModal = document.getElementById('addModal');
+  document.getElementById('openModal').onclick  = () => addModal.classList.add('active');
+  document.getElementById('closeModal').onclick = () => addModal.classList.remove('active');
+  window.addEventListener('click', e => {
+    if (e.target === addModal) {
+      addModal.classList.remove('active');
+    }
+  });
 });
 </script>
+
 {% endblock %}

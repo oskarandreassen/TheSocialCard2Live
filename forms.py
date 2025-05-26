@@ -1,35 +1,26 @@
 # forms.py
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, EqualTo               # ← Lagt till EqualTo här
-from utils.validators import password_strength
-
-
-from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, SubmitField
 from wtforms.validators import Optional, Email, Regexp
-
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from models import User
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, Email, Length
 
 class RegisterForm(FlaskForm):
-    username = StringField(
-        'Användarnamn',
-        validators=[DataRequired(message="Användarnamn saknas")]
-    )
-    password = PasswordField(
-        'Lösenord',
-        validators=[
-            DataRequired(message="Lösenord saknas"),
-            password_strength
-        ]
-    )
-    confirm = PasswordField(
-        'Bekräfta lösenord',
-        validators=[
-            DataRequired(message="Bekräfta lösenord saknas"),
-            EqualTo('password', message='Lösenorden måste matcha.')
-        ]
-    )
-    submit = SubmitField('Skapa konto')
+    username    = StringField('Användarnamn', validators=[DataRequired(), Length(min=3, max=150)])
+    email       = StringField('E-post',       validators=[DataRequired(), Email(), Length(max=120)])
+    password    = PasswordField('Lösenord',   validators=[DataRequired(), Length(min=5), EqualTo('password2', message='Lösenorden måste matcha.')])
+    password2   = PasswordField('Bekräfta lösenord', validators=[DataRequired()])
+    submit      = SubmitField('Registrera')
+
+    def validate_username(self, field):
+        if User.query.filter_by(username=field.data).first():
+            raise ValidationError('Användarnamnet är redan taget.')
+
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError('Den här e-postadressen är redan registrerad.')
 
 class LoginForm(FlaskForm):
     username = StringField(
@@ -55,3 +46,10 @@ class ProfileForm(FlaskForm):
     )
     show_phone = BooleanField("Visa telefonnummer offentligt")
     submit = SubmitField("Spara kontaktinfo")
+
+
+class SetupEmailForm(FlaskForm):
+    email      = StringField('E-post', validators=[DataRequired(), Email(), Length(max=120)])
+    show_email = BooleanField('Visa e-post offentligt')
+    submit     = SubmitField('Spara')
+

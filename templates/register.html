@@ -12,6 +12,13 @@
       {% endfor %}
     </p>
     <p>
+      {{ form.email.label }}<br>
+      {{ form.email(class="form-input") }}<br>
+      {% for err in form.email.errors %}
+        <span class="error">{{ err }}</span><br>
+      {% endfor %}
+    </p>
+    <p>
       {{ form.password.label }}<br>
       {{ form.password(class="form-input") }}<br>
       {% for err in form.password.errors %}
@@ -19,13 +26,13 @@
       {% endfor %}
     </p>
     <p>
-      {{ form.confirm.label }}<br>
-      {{ form.confirm() }}<br>
-      {% for err in form.confirm.errors %}
+      {{ form.password2.label }}<br>
+      {{ form.password2(class="form-input") }}<br>
+      {% for err in form.password2.errors %}
         <span class="error">{{ err }}</span><br>
       {% endfor %}
     </p>
-    <p>{{ form.submit() }}</p>
+    <p>{{ form.submit(class="btn-primary") }}</p>
   </form>
   <p>Har du redan ett konto? <a href="{{ url_for('auth.login') }}">Logga in</a></p>
 {% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Ange e-post{% endblock %}
+{% block content %}
+  <h2>Verkställ e-postbekräftelse</h2>
+  <p>Du måste ange din e-post för att aktivera ditt konto.</p>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <div>
+      {{ form.email.label }}<br>
+      {{ form.email(class="form-input") }}<br>
+      {% for e in form.email.errors %}
+        <span class="error">{{ e }}</span><br>
+      {% endfor %}
+    </div>
+    <button type="submit">{{ form.submit.label.text }}</button>
+  </form>
+{% endblock %}

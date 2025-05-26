@@ -19,6 +19,18 @@
       {% endfor %}
     </p>
     <p>{{ form.submit() }}</p>
+
+
   </form>
+
+{% if 'Du måste bekräfta din e-post' in get_flashed_messages() %}
+  <form method="post" action="{{ url_for('auth.resend_confirm') }}">
+    <input type="hidden" name="email" value="{{ form.username.data }}">
+    <button type="submit" class="btn-link">Skicka ny bekräftelselänk</button>
+  </form>
+{% endif %}
+
+
+
   <p>Inget konto? <a href="{{ url_for('auth.register') }}">Registrera dig</a></p>
 {% endblock %}

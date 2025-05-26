@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from datetime import datetime
+import uuid
 
 db = SQLAlchemy()
 
@@ -20,6 +22,15 @@ class User(db.Model, UserMixin):
     show_email    = db.Column(db.Boolean, default=False)
     phone_number  = db.Column(db.String(20),  nullable=True)
     show_phone    = db.Column(db.Boolean, default=False)
+    email           = db.Column(db.String(120), unique=True, nullable=False)
+    email_confirmed = db.Column(db.Boolean, default=False)
+    email_token     = db.Column(db.String(36), nullable=True)
+    email_sent_at   = db.Column(db.DateTime, nullable=True)
+
+    def generate_email_token(self):
+        self.email_token = str(uuid.uuid4())
+        self.email_sent_at = datetime.utcnow()
+        return self.email_token
 
 
 class Link(db.Model):

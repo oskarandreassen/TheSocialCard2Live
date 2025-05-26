@@ -8,6 +8,11 @@ from flask_migrate import Migrate, upgrade as migrate_upgrade
 from sqlalchemy import inspect as sa_inspect
 from models import db, User
 from datetime import timedelta
+from flask_mail import Mail, Message
+
+from dotenv import load_dotenv
+load_dotenv()      # läser in .env i miljön
+
 
 # ── Logging setup ─────────────────────────────────────────────────────
 logging.basicConfig(level=logging.DEBUG)
@@ -25,7 +30,18 @@ app = Flask(
 # … efter app = Flask(…)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(minutes=5)
 
+app.config.update(
+  MAIL_SERVER        = 'smtp.strato.com',
+  MAIL_PORT          = 587,
+  MAIL_USE_TLS       = True,
+  MAIL_USERNAME      = os.getenv('STRATO_SMTP_USER'),
+  MAIL_PASSWORD      = os.getenv('STRATO_SMTP_PASS'),
+  MAIL_DEFAULT_SENDER= ('SocialCard', 'noreply@socialcard.se'),
+)
+mail = Mail(app)
 
+exempt = {'auth.login', 'auth.register', 'auth.confirm_email',
+          'auth.resend_confirm', 'auth.setup_email', 'public.public_profile', 'static'}
 
 # ── Configuration ─────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'din-superhemliga-nyckel')
@@ -74,6 +90,15 @@ login_manager.login_message = "Du måste logga in för att se den här sidan."
 def load_user(user_id):
     logger.debug(f"Loading user id {user_id}")
     return User.query.get(int(user_id))
+
+@app.before_request
+def require_login():
+    exempt = {
+        'auth.login', 'auth.register', 'auth.confirm_email',
+        'auth.setup_email', 'public.public_profile', 'static'
+    }
+    if not current_user.is_authenticated and request.endpoint not in exempt:
+        return redirect(url_for('auth.login'))
 
 # ── Require login for protected routes ─────────────────────────────────
 @app.before_request
