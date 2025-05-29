@@ -12,7 +12,10 @@ depends_on = None
 
 
 def upgrade():
-    # 1) Backfill any NULL emails with a unique placeholder using user ID
+    # (0) Rensa eventuella kvarvarande temporära tabeller från tidigare misslyckade körningar
+    op.execute("DROP TABLE IF EXISTS _alembic_tmp_user")
+
+    # (1) Backfilla alla NULL-emails med en unik placeholder baserad på user.id
     op.execute(
         """
         UPDATE user
@@ -21,7 +24,7 @@ def upgrade():
         """
     )
 
-    # 2) Alter the table: add confirmation columns and enforce NOT NULL + UNIQUE on email
+    # (2) Lägg till nya kolumner och sätt email till NOT NULL + UNIQUE
     with op.batch_alter_table('user', schema=None) as batch_op:
         batch_op.add_column(sa.Column('email_confirmed', sa.Boolean(), nullable=True))
         batch_op.add_column(sa.Column('email_token', sa.String(length=36), nullable=True))
