@@ -69,17 +69,7 @@ logger.info(f"Using DB URI: {db_uri}")
 db.init_app(app)
 migrate = Migrate(app, db)
 
-# ── Apply Alembic migrations if running against external DB ────────────
-if run_migrations:
-    try:
-        with app.app_context():
-            logger.info("Applying pending migrations...")
-            migrate_upgrade()
-            logger.info("Migrations applied successfully")
-    except Exception as e:
-        logger.error(f"Migration failed: {e}")
-        # For debugging, uncomment:
-        # import pdb; pdb.set_trace()
+
 
 # ── Flask-Login setup ─────────────────────────────────────────────────
 login_manager = LoginManager(app)
