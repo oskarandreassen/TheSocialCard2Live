@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Uppgradera till Premium</h1>
+<p>100 kr engång + 19 kr/mån</p>
+
+<!-- Container där Payment Element mountas -->
+<form id="subscription-form">
+  <div id="payment-element"><!--Stripe.js injects the Element--></div>
+  <button id="submit">Betala & Prenumerera</button>
+  <div id="error-message"></div>
+</form>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const stripe = Stripe("{{ publishable_key }}");
+  const options = {
+    clientSecret: "{{ client_secret }}",
+    appearance: {/* valfri styling */}
+  };
+  const elements = stripe.elements(options);
+  const paymentElement = elements.create('payment');
+  paymentElement.mount('#payment-element');
+
+  const form = document.getElementById('subscription-form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const {error, setupIntent} = await stripe.confirmSetup({
+      elements,
+      confirmParams: { // behövs ej return_url, vi hanterar själva
+        return_url: window.location.href
+      }
+    });
+    if (error) {
+      document.getElementById('error-message').textContent = error.message;
+    } else {
+      // Setup lyckades – skapa prenumerationen på servern
+      const resp = await fetch("{{ url_for('billing.create_subscription') }}", {
+        method: "POST",
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({setup_intent_id: setupIntent.id})
+      });
+      if (resp.ok) {
+        window.location.href = "{{ url_for('billing.success') }}";
+      } else {
+        const err = await resp.json();
+        document.getElementById('error-message').textContent = err.error || 'Ett fel uppstod';
+      }
+    }
+  });
+</script>
+{% endblock %}

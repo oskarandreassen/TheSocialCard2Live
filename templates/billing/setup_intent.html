@@ -1,0 +1,64 @@
+<!-- templates/billing/setup_intent.html -->
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Uppgradera till Premium</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body { font-family: Inter, Arial, sans-serif; padding: 2rem; }
+        .center { max-width: 400px; margin: auto; }
+        #payment-element { margin-bottom: 1.5rem; }
+        #submit { width: 100%; padding: 1rem; font-size: 1.2em; background: #305aff; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="checkout-summary" style="background:#fff; border-radius:12px; padding:24px; margin-bottom:24px; box-shadow:0 2px 8px #eee;">
+  <h2>Du får:</h2>
+  <ul style="list-style:none; padding-left:0;">
+    <li><strong>✔️ SocialCard NFC-kort (värde 249 kr) – GRATIS!</strong></li>
+    <li><strong>✔️ Premium-medlemskap</strong> för <strong>19 kr/mån</strong></li>
+    <li><strong>✔️ Omedelbar tillgång till premiumfunktioner</strong></li>
+  </ul>
+  <div style="font-size:1.1rem; margin-top:16px;">
+    <b>Att betala nu:</b> 19 kr/mån (ingen startavgift)
+  </div>
+</div>
+
+    <div class="center">
+        <h2>Uppgradera till Premium</h2>
+        <div class="checkout-price-summary">
+    <p><b>Du betalar:</b> 19 kr/månad</p>
+    <p><i>Kortet (värde 249 kr) ingår gratis vid tecknande av medlemskap!</i></p>
+</div>
+
+        <form id="payment-form">
+            <div id="payment-element"></div>
+            <button id="submit">Betala och påbörja prenumeration</button>
+        </form>
+        <div id="error-message"></div>
+    </div>
+    <script>
+        const stripe = Stripe("{{ STRIPE_PUBLISHABLE_KEY }}");
+        const clientSecret = "{{ client_secret }}";
+
+        const elements = stripe.elements({ clientSecret });
+        const paymentElement = elements.create('payment');
+        paymentElement.mount('#payment-element');
+
+        const form = document.getElementById('payment-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const {error} = await stripe.confirmSetup({
+                elements,
+                confirmParams: {
+                    return_url: window.location.origin + "/billing/success"  // Skapa denna endpoint för klar feedback
+                }
+            });
+            if (error) {
+                document.getElementById('error-message').textContent = error.message;
+            }
+        });
+    </script>
+</body>
+</html>

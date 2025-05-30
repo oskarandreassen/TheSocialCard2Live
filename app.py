@@ -1,6 +1,8 @@
 # app.py
 import os
 import logging
+
+import stripe
 from flask import Flask, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
@@ -9,6 +11,8 @@ from sqlalchemy import inspect as sa_inspect
 from models import db, User
 from datetime import timedelta
 from flask_mail import Mail, Message
+
+from billing import billing
 
 from dotenv import load_dotenv
 load_dotenv()      # läser in .env i miljön
@@ -47,6 +51,12 @@ exempt = {'auth.login', 'auth.register', 'auth.confirm_email',
 
 from admin import admin_bp
 app.register_blueprint(admin_bp)
+
+from billing import billing
+
+
+# Registrera billing-blueprint med prefix "/billing"
+app.register_blueprint(billing, url_prefix='/billing')
 
 
 # ── Configuration ─────────────────────────────────────────────────────
@@ -122,7 +132,32 @@ if not run_migrations:
         logger.debug(f"Existing tables locally: {existing}")
         if 'user' not in existing or 'link' not in existing:
             logger.info("Creating tables via db.create_all() (local)")
-            db.create_all()
+            #db.create_all()
+
+
+
+from flask import request, abort
+
+@app.route('/webhook', methods=['POST'])
+def stripe_webhook():
+    payload    = request.data
+    sig_header = request.headers.get('Stripe-Signature')
+    secret     = os.environ['STRIPE_WEBHOOK_SECRET']
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, secret)
+    except stripe.error.SignatureVerificationError:
+        abort(400)
+
+    if event['type'] == 'checkout.session.completed':
+        sess = event['data']['object']
+        user = User.query.filter_by(stripe_customer_id=sess['customer']).first()
+        if user:
+            user.is_premium             = True
+            user.stripe_subscription_id = sess.get('subscription')
+            db.session.commit()
+    return '', 200
+
+
 
 # ── Run server ────────────────────────────────────────────────────────
 if __name__ == '__main__':

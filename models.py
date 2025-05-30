@@ -35,6 +35,11 @@ class User(db.Model, UserMixin):
     created_at  = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     last_login  = db.Column(db.DateTime, nullable=True)
 
+    ## BETALNINGAR
+    is_premium             = db.Column(db.Boolean, default=False, nullable=False)
+    stripe_customer_id     = db.Column(db.String,  nullable=True)
+    stripe_subscription_id = db.Column(db.String,  nullable=True)
+
     def __repr__(self):
         return f'<User {self.username}>'
 
