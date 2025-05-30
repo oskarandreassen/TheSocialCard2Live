@@ -11,8 +11,8 @@ from models import User
 
 stripe.api_key = os.environ['STRIPE_SECRET_KEY']
 
-ONE_TIME_PRODUCT = os.environ['STRIPE_ONE_TIME_PRODUCT']   # prod_SPGzL8IdlrO5MD
-MONTHLY_PRODUCT  = os.environ['STRIPE_MONTHLY_PRODUCT']    # prod_SPGyLFMbZBQ0PE
+#ONE_TIME_PRODUCT = os.environ['STRIPE_ONE_TIME_PRODUCT']   # prod_SPGzL8IdlrO5MD
+MONTHLY_PRODUCT  = os.environ.get('STRIPE_MONTHLY_PRODUCT', None)   # prod_SPGyLFMbZBQ0PE
 
 billing = Blueprint('billing', __name__, url_prefix='/billing')
 
