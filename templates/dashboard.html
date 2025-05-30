@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
+
+import stripe
+
 <div class="dashboard-layout">
 
   <!-- 🎛️ DASHBOARD PANEL I MITTEN -->
@@ -266,15 +269,16 @@
   </div>
 </div>
 
-  {% if not current_user.is_premium %}
-  <form action="{{ url_for('billing.setup_intent') }}" method="get">
-    <button type="submit" class="btn btn-primary">
-      Uppgradera till Premium
-    </button>
-  </form>
-{% else %}
-  <span class="badge bg-success">Premium-medlem</span>
-{% endif %}
+<script async
+  src="https://js.stripe.com/v3/buy-button.js">
+</script>
+
+<stripe-buy-button
+  buy-button-id="buy_btn_1RUa6jFtyUtnU3eLm3ab1Axx"
+  publishable-key="pk_live_51RUSDtFtyUtnU3eLv4nJM6yNMXKgylBizaoYGtIzcSGNhFnHyNOY1u0SRHIGxI6nI6EpzGRvZNRHn2v6DjXPgiUO00LR9a4iWD"
+>
+</stripe-buy-button>
+
 
 <style>
   /* Responsivt */
