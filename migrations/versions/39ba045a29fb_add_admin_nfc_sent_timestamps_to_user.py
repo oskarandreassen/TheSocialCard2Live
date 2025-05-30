@@ -15,35 +15,35 @@ depends_on = None
 
 
 def upgrade():
-    # 1) Lägg till kolumner utan default, men med server_default för booleans
-    op.add_column(
-        'user',
-        sa.Column('is_admin', sa.Boolean(), nullable=False,
-                  server_default=sa.text('0'))
-    )
-    op.add_column(
-        'user',
-        sa.Column('nfc_sent', sa.Boolean(), nullable=False,
-                  server_default=sa.text('0'))
-    )
-    # timestamps som nullable till att börja med
-    op.add_column(
-        'user',
-        sa.Column('created_at', sa.DateTime(), nullable=True)
-    )
-    op.add_column(
-        'user',
-        sa.Column('last_login', sa.DateTime(), nullable=True)
-    )
+    bind = op.get_bind()
+    insp = inspect(bind)
+    existing = {col['name'] for col in insp.get_columns('user')}
 
-    # 2) Backfilla befintliga rader: sätt created_at = now
+    # Lägg bara till kolumner om de inte redan finns
+    if 'is_admin' not in existing:
+        op.add_column('user',
+            sa.Column('is_admin', sa.Boolean(), nullable=False, server_default=sa.false())
+        )
+    if 'nfc_sent' not in existing:
+        op.add_column('user',
+            sa.Column('nfc_sent', sa.Boolean(), nullable=False, server_default=sa.false())
+        )
+    if 'created_at' not in existing:
+        op.add_column('user',
+            sa.Column('created_at', sa.DateTime(), nullable=False,
+                      server_default=sa.text('CURRENT_TIMESTAMP'))
+        )
+    if 'last_login' not in existing:
+        op.add_column('user',
+            sa.Column('last_login', sa.DateTime(), nullable=True)
+        )
+
+    # Backfill och eventuella custom-uppdateringar
     op.execute("""
         UPDATE "user"
         SET created_at = CURRENT_TIMESTAMP
         WHERE created_at IS NULL;
     """)
-
-    # 3) Hårdkoda ditt admin-konto
     op.execute("""
         UPDATE "user"
         SET is_admin = 1
@@ -51,12 +51,11 @@ def upgrade():
           AND email    = 'oskarandreassen01@gmail.com';
     """)
 
-    # 4) Rulla bort server_default så det bara gäller vid migreringen
-    op.alter_column('user', 'is_admin',   server_default=None)
-    op.alter_column('user', 'nfc_sent',   server_default=None)
-
-    # 5) Gör created_at non-nullable
-    op.alter_column('user', 'created_at', nullable=False)
+    # Ta bort server_default för kolumnerna, men bara på andra dialekter än SQLite
+    if bind.dialect.name != 'sqlite':
+        op.alter_column('user', 'is_admin',   server_default=None)
+        op.alter_column('user', 'nfc_sent',   server_default=None)
+        op.alter_column('user', 'created_at', server_default=None)
 
 
 def downgrade():
