@@ -29,6 +29,12 @@ class User(db.Model, UserMixin):
     email_token      = db.Column(db.String(36), nullable=True)
     email_sent_at    = db.Column(db.DateTime, nullable=True)
 
+    ##ADMIN VYN
+    is_admin    = db.Column(db.Boolean, default=False)
+    nfc_sent    = db.Column(db.Boolean, default=False)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    last_login  = db.Column(db.DateTime, nullable=True)
+
     def __repr__(self):
         return f'<User {self.username}>'
 

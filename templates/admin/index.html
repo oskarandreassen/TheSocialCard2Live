@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Admin‐panel</h1>
+
+<section class="stats">
+  <p><strong>Totalt användare:</strong> {{ total_users }}</p>
+  <p><strong>Nya senaste 7 dagar:</strong> {{ recent_week }}</p>
+  <p><strong>Bekräftade email:</strong> {{ confirmed_emails }}</p>
+  <p><strong>Bekräftade telefoner:</strong> {{ confirmed_phones }}</p>
+  <p><strong>NFC skickade:</strong> {{ nfc_sent_count }}</p>
+</section>
+
+<form method="get" class="admin-search-form">
+  <input name="q" placeholder="Sök användarnamn eller email" value="{{ q }}">
+  <select name="email_confirmed">
+    <option value="">Alla email‐statusar</option>
+    <option value="yes" {% if filter_email=='yes' %}selected{% endif %}>Bekräftade</option>
+    <option value="no"  {% if filter_email=='no'  %}selected{% endif %}>Ej bekräftade</option>
+  </select>
+  <select name="is_admin">
+    <option value="">Alla roller</option>
+    <option value="yes" {% if filter_admin=='yes' %}selected{% endif %}>Admin</option>
+    <option value="no"  {% if filter_admin=='no'  %}selected{% endif %}>Vanliga</option>
+  </select>
+  <button type="submit">Filtrera</button>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th><th>Användarnamn</th><th>Email</th><th>Admin?</th>
+      <th>EmailOK?</th><th>TelOK?</th><th>NFC?</th><th>Reg.datum</th><th>Profil</th><th>Åtgärd</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for u in users %}
+    <tr>
+      <td>{{ u.id }}</td>
+      <td>{{ u.username }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ '✔' if u.is_admin else '–' }}</td>
+      <td>{{ '✔' if u.email_confirmed else '–' }}</td>
+      <td>{{ '✔' if u.show_phone else '–' }}</td>
+      <td>{{ '✔' if u.nfc_sent else '–' }}</td>
+      <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+      <td>  <a href="{{ url_for('public.public_profile', username=u.username) }}" target="_blank">Visa</a></td>
+      <td><a href="{{ url_for('admin.user_detail', user_id=u.id) }}">Detaljer</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<div class="pagination">
+  {% if pagination.has_prev %}
+    <a href="{{ url_for('admin.index', page=pagination.prev_num,
+                          q=q, email_confirmed=filter_email, is_admin=filter_admin) }}">← Föregående</a>
+  {% endif %}
+  <span> Sida {{ pagination.page }} av {{ pagination.pages }} </span>
+  {% if pagination.has_next %}
+    <a href="{{ url_for('admin.index', page=pagination.next_num,
+                          q=q, email_confirmed=filter_email, is_admin=filter_admin) }}">Nästa →</a>
+  {% endif %}
+</div>
+
+<p><a href="{{ url_for('admin.export_csv') }}">Exportera alla användare som CSV</a></p>
+{% endblock %}

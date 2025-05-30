@@ -14,6 +14,8 @@ from dotenv import load_dotenv
 load_dotenv()      # läser in .env i miljön
 
 
+
+
 # ── Logging setup ─────────────────────────────────────────────────────
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -42,6 +44,10 @@ mail = Mail(app)
 
 exempt = {'auth.login', 'auth.register', 'auth.confirm_email',
           'auth.resend_confirm', 'auth.setup_email', 'public.public_profile', 'static'}
+
+from admin import admin_bp
+app.register_blueprint(admin_bp)
+
 
 # ── Configuration ─────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'din-superhemliga-nyckel')

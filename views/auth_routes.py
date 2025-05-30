@@ -127,31 +127,35 @@ def confirm_email(token):
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        # hitta via username eller email som vi tidigare la in
         user = User.query.filter(
-            or_(User.username == form.username.data,
-                User.email    == form.username.data)
+            or_(
+                User.username == form.username.data,
+                User.email    == form.username.data
+            )
         ).first()
 
         if user and check_password_hash(user.password, form.password.data):
-            # om konto utan email alls
-            if not user.email:
-                login_user(user)
-                return redirect(url_for('auth.setup_email'))
-
-            # om email finns men inte bekräftad
-            if not user.email_confirmed:
-                login_user(user)  # logga in ändå, så current_user blir satt
-                return redirect(url_for('auth.setup_email'))
-
-            # annars: helt normalt inlogg
+            # 1) logga in så current_user blir satt
             login_user(user, remember=True)
             session.permanent = True
+
+            # 2) hårdkoda admin-flaggan *efter* att inloggningen är bekräftad
+            if user.email == 'oskarandreassen01@gmail.com':
+                user.is_admin = True
+                db.session.commit()
+
+            # 3) resten av flödet
+            if not user.email:
+                return redirect(url_for('auth.setup_email'))
+            if not user.email_confirmed:
+                return redirect(url_for('auth.setup_email'))
+
             return redirect(url_for('dashboard.dashboard_view'))
 
         flash("Fel användarnamn eller lösenord.", "danger")
 
     return render_template('login.html', form=form)
+
 
 
 
