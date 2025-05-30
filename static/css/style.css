@@ -539,3 +539,8 @@ body.rainbow { background: linear-gradient(90deg,red,orange,yellow,green,blue,in
 .small-icon-btn i {
   pointer-events: none;            /* let clicks bubble to the button */
 }
+
+body { font-family: Inter, Arial, sans-serif; padding: 2rem; }
+.center { max-width: 400px; margin: auto; }
+#payment-element { margin-bottom: 1.5rem; }
+#submit { width: 100%; padding: 1rem; font-size: 1.2em; background: #305aff; color: #fff; border: none; border-radius: 8px; cursor: pointer; }

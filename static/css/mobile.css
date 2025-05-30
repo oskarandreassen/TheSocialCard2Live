@@ -246,3 +246,72 @@
     margin: 0;
   }
 }
+
+/* Exempel på mobilanpassning för Stripe payment-element */
+@media (max-width: 600px) {
+
+  body {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1.15rem;
+    background: #fafbfc;
+    margin: 0;
+    padding: 0.5rem !important;
+  }
+
+  .checkout-summary {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem 0.8rem;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px #eee;
+    font-size: 1.12rem;
+    max-width: 98vw;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .checkout-summary h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.7em;
+  }
+
+  .checkout-summary ul {
+    padding-left: 0.7em;
+    margin-bottom: 0.5em;
+  }
+
+  .center {
+    max-width: 98vw;
+    margin: 0 auto;
+    padding: 1em 0.4em;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #eee;
+  }
+
+  .center h2 {
+    font-size: 1.15rem;
+    margin-bottom: 0.7em;
+    margin-top: 0.5em;
+  }
+
+  .checkout-price-summary {
+    font-size: 1.02rem;
+    margin-bottom: 1em;
+  }
+
+  #payment-element {
+    margin-bottom: 1.2em;
+  }
+
+  #submit {
+    width: 100%;
+    padding: 1.1em;
+    font-size: 1.1rem;
+    background: #305aff;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+  }
+}
