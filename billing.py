@@ -29,7 +29,7 @@ billing = Blueprint('billing', __name__, url_prefix='/billing')
 
 @billing.route('/webhook', methods=['POST'])
 def stripe_webhook():
-    import sys
+    import sys, traceback
     payload = request.data
     sig_header = request.headers.get('Stripe-Signature')
     webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET')
@@ -42,35 +42,38 @@ def stripe_webhook():
         print("[Webhook] Signature error:", e, file=sys.stderr)
         return str(e), 400
 
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        client_reference_id = session.get('client_reference_id')
-        customer_email = session.get('customer_email', '').strip().lower()
-        print(f"[Webhook] checkout.session.completed! Stripe email: '{customer_email}', client_reference_id: '{client_reference_id}'", file=sys.stderr)
+    try:
+        if event['type'] == 'checkout.session.completed':
+            session = event['data']['object']
+            client_reference_id = session.get('client_reference_id')
+            customer_email = session.get('customer_email', '').strip().lower()
+            print(f"[Webhook] checkout.session.completed! Stripe email: '{customer_email}', client_reference_id: '{client_reference_id}'", file=sys.stderr)
 
-        from models import User
-        user = None
+            from models import User
+            user = None
 
-        # 1. Försök hitta användare via client_reference_id (id eller username)
-        if client_reference_id:
-            # Om du använder username som referens
-            user = User.query.filter_by(username=client_reference_id).first()
-            # Om du använder id istället, byt raden ovan till:
-            # try:
-            #     user = User.query.get(int(client_reference_id))
-            # except Exception:
-            #     user = None
+            if client_reference_id:
+                user = User.query.filter_by(username=client_reference_id).first()
+                # eller om du kör id:
+                # try:
+                #     user = User.query.get(int(client_reference_id))
+                # except Exception:
+                #     user = None
 
-        # 2. Om ingen user hittades – försök via email (case-insensitive)
-        if not user and customer_email:
-            user = User.query.filter(db.func.lower(User.email) == customer_email).first()
+            if not user and customer_email:
+                user = User.query.filter(db.func.lower(User.email) == customer_email).first()
 
-        if user:
-            user.is_premium = True
-            db.session.commit()
-            print(f"[Webhook] User hittad & uppdaterad: id={user.id}, username={user.username}, email={user.email}", file=sys.stderr)
-        else:
-            print(f"[Webhook] Ingen user hittad för client_reference_id '{client_reference_id}' eller email '{customer_email}'", file=sys.stderr)
+            if user:
+                user.is_premium = True
+                db.session.commit()
+                print(f"[Webhook] User hittad & uppdaterad: id={user.id}, username={user.username}, email={user.email}", file=sys.stderr)
+            else:
+                print(f"[Webhook] Ingen user hittad för client_reference_id '{client_reference_id}' eller email '{customer_email}'", file=sys.stderr)
+    except Exception as e:
+        print("[Webhook] Undantag/fel i handler:", e, file=sys.stderr)
+        print(traceback.format_exc(), file=sys.stderr)
+        return f"Internal Server Error: {e}", 500
 
     return '', 200
+
 
