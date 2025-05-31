@@ -540,7 +540,190 @@ body.rainbow { background: linear-gradient(90deg,red,orange,yellow,green,blue,in
   pointer-events: none;            /* let clicks bubble to the button */
 }
 
-body { font-family: Inter, Arial, sans-serif; padding: 2rem; }
+body { font-family: Inter, Arial, sans-serif; padding: 0; }
 .center { max-width: 400px; margin: auto; }
 #payment-element { margin-bottom: 1.5rem; }
 #submit { width: 100%; padding: 1rem; font-size: 1.2em; background: #305aff; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+
+
+/* Tabelliknande vy för detaljsida */
+.user-details-card {
+  max-width: 500px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+}
+
+.user-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 1.04em;
+}
+.user-details-table th {
+  text-align: left;
+  padding: 0.35em 1em 0.35em 0;
+  color: #888;
+  font-weight: 500;
+  width: 180px;
+}
+.user-details-table td {
+  padding: 0.35em 0.5em;
+  background: #fafafc;
+  border-radius: 7px;
+  min-width: 120px;
+}
+
+.status-check {
+  color: #12c05c;
+  font-size: 1.1em;
+  margin-left: 0.5em;
+}
+.status-cross {
+  color: #ccc;
+  font-size: 1.1em;
+  margin-left: 0.5em;
+}
+.premium-badge-table {
+  color: #b89306;
+  font-weight: bold;
+  padding: 0.2em 0.5em;
+  background: #fff8d4;
+  border-radius: 1em;
+  font-size: 1em;
+  box-shadow: 0 0 3px #ffe06666;
+}
+
+.user-actions-form {
+  margin-top: 1.4em;
+  margin-bottom: 1.4em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+}
+.user-actions-form button {
+  background: #e5e7eb;
+  border: none;
+  padding: 0.6em 1.2em;
+  border-radius: 10px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.user-actions-form button:hover {
+  background: #d1d5db;
+}
+
+/* Navbar premium badge */
+.premium-badge-navbar {
+  color: #fff;
+  background: #ffbe3b;
+  border-radius: 1em;
+  font-weight: bold;
+  font-size: 0.85em;
+  padding: 0.18em 0.8em 0.18em 0.5em;
+  margin-left: 0.8em;
+  box-shadow: 0 2px 8px #ffecb066;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+  display: inline-block;
+  position: relative;
+  top: -1px;
+}
+
+
+.admin-table-wrapper {
+  overflow-x: auto;
+  margin: 2em 0;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  font-size: 1em;
+}
+.admin-table th, .admin-table td {
+  padding: 0.6em 1em;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+.admin-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #777;
+}
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.status-check {
+  color: #12c05c;
+  font-size: 1.15em;
+}
+.status-cross {
+  color: #ccc;
+  font-size: 1.15em;
+}
+.premium-badge-table {
+  color: #b89306;
+  font-weight: bold;
+  padding: 0.13em 0.6em 0.13em 0.45em;
+  background: #fff8d4;
+  border-radius: 1em;
+  font-size: 0.97em;
+  box-shadow: 0 0 3px #ffe06666;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.admin-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em 2em;
+  margin: 1.2em 0 2em 0;
+  font-size: 1.09em;
+  color: #444;
+}
+.admin-search-form {
+  margin: 1.6em 0;
+  display: flex;
+  gap: 0.8em;
+  flex-wrap: wrap;
+}
+.admin-search-form input, .admin-search-form select {
+  padding: 0.45em 0.7em;
+  border-radius: 7px;
+  border: 1px solid #ddd;
+  font-size: 1em;
+}
+.admin-search-form button {
+  background: #ffe066;
+  color: #222;
+  border: none;
+  border-radius: 7px;
+  padding: 0.45em 1.1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.admin-search-form button:hover {
+  background: #ffd54f;
+}
+.pagination {
+  display: flex;
+  gap: 2em;
+  align-items: center;
+  margin: 2.2em 0;
+  font-size: 1.06em;
+}
+.pagination a {
+  color: #3274d9;
+  text-decoration: none;
+  font-weight: 500;
+}
+.pagination a:hover {
+  text-decoration: underline;
+}

@@ -1,35 +1,95 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Användare #{{ user.id }} – {{ user.username }}</h2>
-<p><strong>Email:</strong> {{ user.email }} {% if user.email_confirmed %}✔{% endif %}</p>
-<p><strong>Telefon:</strong> {{ user.phone_number }} {% if user.show_phone %}✔{% endif %}</p>
-<p><strong>Registrerad:</strong> {{ user.created_at }}</p>
-<p><strong>Senaste inloggning:</strong> {{ user.last_login or '–' }}</p>
-<p><strong>NFC skickad:</strong> {{ '✔' if user.nfc_sent else '–' }}</p>
-<p><strong>Synlig profil:</strong> {{ '✔' if user.is_visible else '–' }}</p>
-<p><strong>Admin:</strong> {{ '✔' if user.is_admin else '–' }}</p>
+<div class="user-details-card">
+  <h2>Användare #{{ user.id }} – {{ user.username }}</h2>
+  <table class="user-details-table">
+    <tr>
+      <th>Email:</th>
+      <td>
+        {{ user.email }}
+        {% if user.email_confirmed %}
+          <span class="status-check">✔</span>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th>Telefon:</th>
+      <td>
+        {{ user.phone_number or '–' }}
+        {% if user.show_phone %}
+          <span class="status-check">✔</span>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th>Registrerad:</th>
+      <td>{{ user.created_at }}</td>
+    </tr>
+    <tr>
+      <th>Senaste inloggning:</th>
+      <td>{{ user.last_login or '–' }}</td>
+    </tr>
+    <tr>
+      <th>NFC skickad:</th>
+      <td>
+        {% if user.nfc_sent %}
+          <span class="status-check">✔</span>
+        {% else %}
+          <span class="status-cross">–</span>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th>Synlig profil:</th>
+      <td>
+        {% if user.is_visible %}
+          <span class="status-check">✔</span>
+        {% else %}
+          <span class="status-cross">–</span>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th>Admin:</th>
+      <td>
+        {% if user.is_admin %}
+          <span class="status-check">✔</span>
+        {% else %}
+          <span class="status-cross">–</span>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th>Premium:</th>
+      <td>
+        {% if user.is_premium %}
+          <span class="premium-badge-table">★ Premium</span>
+        {% else %}
+          <span class="status-cross">–</span>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
 
-<form method="post">
-  <button name="action" value="toggle_nfc">Toggle NFC-skickad</button>
-  {% if user.is_visible %}
-    <button name="action" value="disable">Inaktivera profil</button>
-  {% else %}
-    <button name="action" value="activate">Aktivera profil</button>
+  <form method="post" class="user-actions-form">
+    <button name="action" value="toggle_nfc">Toggle NFC-skickad</button>
+    {% if user.is_visible %}
+      <button name="action" value="disable">Inaktivera profil</button>
+    {% else %}
+      <button name="action" value="activate">Aktivera profil</button>
+    {% endif %}
+    <button name="action" value="impersonate">Logga in som användare</button>
+  </form>
+
+  {% if session.admin_id %}
+    <p><a href="{{ url_for('admin.stop_impersonate') }}">Återgå till admin</a></p>
   {% endif %}
-  <button name="action" value="impersonate">Logga in som användare</button>
-</form>
 
-{% if session.admin_id %}
-  <p><a href="{{ url_for('admin.stop_impersonate') }}">Återgå till admin</a></p>
-{% endif %}
-
-
-<h3>Användarens länkar</h3>
-<ul>
-  {% for link in user.links %}
-    <li><a href="{{ link.url }}">{{ link.label }}</a></li>
-  {% endfor %}
-</ul>
+  <h3>Användarens länkar</h3>
+  <ul>
+    {% for link in user.links %}
+      <li><a href="{{ link.url }}">{{ link.label }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
 {% endblock %}
-
-

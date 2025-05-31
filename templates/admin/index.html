@@ -2,12 +2,12 @@
 {% block content %}
 <h1>Admin‐panel</h1>
 
-<section class="stats">
-  <p><strong>Totalt användare:</strong> {{ total_users }}</p>
-  <p><strong>Nya senaste 7 dagar:</strong> {{ recent_week }}</p>
-  <p><strong>Bekräftade email:</strong> {{ confirmed_emails }}</p>
-  <p><strong>Bekräftade telefoner:</strong> {{ confirmed_phones }}</p>
-  <p><strong>NFC skickade:</strong> {{ nfc_sent_count }}</p>
+<section class="stats admin-stats">
+  <div><strong>Totalt användare:</strong> {{ total_users }}</div>
+  <div><strong>Nya senaste 7 dagar:</strong> {{ recent_week }}</div>
+  <div><strong>Bekräftade email:</strong> {{ confirmed_emails }}</div>
+  <div><strong>Bekräftade telefoner:</strong> {{ confirmed_phones }}</div>
+  <div><strong>NFC skickade:</strong> {{ nfc_sent_count }}</div>
 </section>
 
 <form method="get" class="admin-search-form">
@@ -25,30 +25,48 @@
   <button type="submit">Filtrera</button>
 </form>
 
-<table>
-  <thead>
-    <tr>
-      <th>ID</th><th>Användarnamn</th><th>Email</th><th>Admin?</th>
-      <th>EmailOK?</th><th>TelOK?</th><th>NFC?</th><th>Reg.datum</th><th>Profil</th><th>Åtgärd</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for u in users %}
-    <tr>
-      <td>{{ u.id }}</td>
-      <td>{{ u.username }}</td>
-      <td>{{ u.email }}</td>
-      <td>{{ '✔' if u.is_admin else '–' }}</td>
-      <td>{{ '✔' if u.email_confirmed else '–' }}</td>
-      <td>{{ '✔' if u.show_phone else '–' }}</td>
-      <td>{{ '✔' if u.nfc_sent else '–' }}</td>
-      <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
-      <td>  <a href="{{ url_for('public.public_profile', username=u.username) }}" target="_blank">Visa</a></td>
-      <td><a href="{{ url_for('admin.user_detail', user_id=u.id) }}">Detaljer</a></td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
+<div class="admin-table-wrapper">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Användarnamn</th>
+        <th>Email</th>
+        <th>Admin?</th>
+        <th>Premium?</th>
+        <th>EmailOK?</th>
+        <th>TelOK?</th>
+        <th>NFC?</th>
+        <th>Reg.datum</th>
+        <th>Profil</th>
+        <th>Åtgärd</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for u in users %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.username }}</td>
+        <td>{{ u.email }}</td>
+        <td>{% if u.is_admin %}<span class="status-check">✔</span>{% else %}<span class="status-cross">–</span>{% endif %}</td>
+        <td>
+          {% if u.is_premium %}
+            <span class="premium-badge-table">★ Premium</span>
+          {% else %}
+            <span class="status-cross">–</span>
+          {% endif %}
+        </td>
+        <td>{% if u.email_confirmed %}<span class="status-check">✔</span>{% else %}<span class="status-cross">–</span>{% endif %}</td>
+        <td>{% if u.show_phone %}<span class="status-check">✔</span>{% else %}<span class="status-cross">–</span>{% endif %}</td>
+        <td>{% if u.nfc_sent %}<span class="status-check">✔</span>{% else %}<span class="status-cross">–</span>{% endif %}</td>
+        <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+        <td><a href="{{ url_for('public.public_profile', username=u.username) }}" target="_blank">Visa</a></td>
+        <td><a href="{{ url_for('admin.user_detail', user_id=u.id) }}">Detaljer</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
 
 <div class="pagination">
   {% if pagination.has_prev %}
