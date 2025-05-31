@@ -6,6 +6,7 @@ import stripe
 from flask_login import login_required, current_user
 from app import db
 from models import User
+import json
 
 stripe.api_key = os.environ['STRIPE_SECRET_KEY']
 
@@ -29,7 +30,7 @@ billing = Blueprint('billing', __name__, url_prefix='/billing')
 
 @billing.route('/webhook', methods=['POST'])
 def stripe_webhook():
-    import sys, traceback
+    import sys, traceback, json
     payload = request.data
     sig_header = request.headers.get('Stripe-Signature')
     webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET')
@@ -45,21 +46,34 @@ def stripe_webhook():
     try:
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
+
+            # Logga hela sessionen för felsökning
+            print("[Webhook] RAW EVENT:", json.dumps(session, indent=2), file=sys.stderr)
+
             client_reference_id = session.get('client_reference_id')
-            customer_email = session.get('customer_email', '').strip().lower()
+            customer_email_raw = session.get('customer_email', '')
+
+            # Robust hantering om email är None
+            if customer_email_raw:
+                customer_email = customer_email_raw.strip().lower()
+            else:
+                customer_email = ''
+
             print(f"[Webhook] checkout.session.completed! Stripe email: '{customer_email}', client_reference_id: '{client_reference_id}'", file=sys.stderr)
 
             from models import User
             user = None
 
+            # 1. Försök hitta användare via client_reference_id (username eller id)
             if client_reference_id:
                 user = User.query.filter_by(username=client_reference_id).first()
-                # eller om du kör id:
+                # Om du vill använda id istället, byt ut raden ovan mot:
                 # try:
                 #     user = User.query.get(int(client_reference_id))
                 # except Exception:
                 #     user = None
 
+            # 2. Om ingen user hittades – försök via email (case-insensitive)
             if not user and customer_email:
                 user = User.query.filter(db.func.lower(User.email) == customer_email).first()
 
@@ -69,11 +83,13 @@ def stripe_webhook():
                 print(f"[Webhook] User hittad & uppdaterad: id={user.id}, username={user.username}, email={user.email}", file=sys.stderr)
             else:
                 print(f"[Webhook] Ingen user hittad för client_reference_id '{client_reference_id}' eller email '{customer_email}'", file=sys.stderr)
+
     except Exception as e:
         print("[Webhook] Undantag/fel i handler:", e, file=sys.stderr)
         print(traceback.format_exc(), file=sys.stderr)
         return f"Internal Server Error: {e}", 500
 
     return '', 200
+
 
 
