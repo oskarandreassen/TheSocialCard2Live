@@ -34,7 +34,8 @@
       {% elif "slack.com"      in link.url %}{% set icon = "fab fa-slack"      %}
       {% elif "discord.com"    in link.url %}{% set icon = "fab fa-discord"    %}
       {% elif "skype.com"      in link.url %}{% set icon = "fab fa-skype"      %}
-      {% elif "mastodon"       in link.url %}{% set icon = "fab fa-mastodon"   %}
+      {% elif "vsco"      in link.url %}{% set icon = "fas fa-camera-retro" %}
+      {% elif "mastodon"  in link.url %}{% set icon = "fab fa-mastodon" %}
       {% endif %}
       <a class="link-button {{ user.template }}" href="{{ link.url }}" target="_blank">
         {% if icon %}<i class="{{ icon }}"></i>{% endif %}

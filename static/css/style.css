@@ -730,22 +730,41 @@ body { font-family: Inter, Arial, sans-serif; padding: 0; }
 
 
 .btn-stripe-premium {
-  display: block;
-  margin: 2em auto 0 auto;
+  display: inline-block;
+  margin: 1.5em auto 0 auto;
   background: #305aff;
-  color: #fff;
-  padding: 1em 2.4em;
-  border-radius: 12px;
-  font-size: 1em;
-  font-weight: bold;
+  color: #fff !important;
+  padding: 0.4em 1em;
+  border-radius: 7px;
+  font-size: 0.97em;
+  font-weight: 600;
   text-align: center;
-  text-decoration: none;
-  box-shadow: 0 3px 12px rgba(48,90,255,0.13);
-  transition: background 0.2s, box-shadow 0.2s;
-  width: 100px;
-  height: 30px;
+  text-decoration: none !important;
+  box-shadow: 0 2px 8px rgba(48,90,255,0.11);
+  transition: background 0.18s, box-shadow 0.18s;
+  width: 150px;          /* <-- Ändrat till 150px */
+  height: 36px;
+  line-height: 36px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;   /* <-- Gör att texten aldrig radbryts! */
 }
-.btn-stripe-premium:hover {
+.btn-stripe-premium:hover,
+.btn-stripe-premium:focus {
   background: #0031a6;
-  box-shadow: 0 6px 18px rgba(48,90,255,0.18);
+  box-shadow: 0 4px 12px rgba(48,90,255,0.17);
+  color: #fff !important;
 }
+
+@media (max-width: 600px) {
+  .btn-stripe-premium {
+    width: 140px;      /* <-- Lite smalare på mobil men ändå plats för texten */
+    height: 32px;
+    font-size: 0.92em;
+    padding: 0.3em 0.5em;
+    line-height: 32px;
+    margin: 1em auto 0 auto;
+  }
+}
+
+

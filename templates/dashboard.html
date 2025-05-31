@@ -58,6 +58,8 @@
               {% elif "discord.com"     in link.url %}{% set icon = "fab fa-discord"     %}
               {% elif "skype.com"       in link.url %}{% set icon = "fab fa-skype"       %}
               {% elif "mastodon"        in link.url %}{% set icon = "fab fa-mastodon"    %}
+                  {% elif "vsco"      in link.url %}{% set icon = "fas fa-camera-retro" %}
+
               {% endif %}
               <a class="link-button {{ user.template }}"
                  href="#" onclick="return false;">
@@ -144,6 +146,8 @@
           {% elif "discord.com"     in link.url %}{% set icon = "fab fa-discord"     %}
           {% elif "skype.com"       in link.url %}{% set icon = "fab fa-skype"       %}
           {% elif "mastodon"        in link.url %}{% set icon = "fab fa-mastodon"    %}
+            {% elif "vsco"      in link.url %}{% set icon = "fas fa-camera-retro" %}
+
         {% endif %}
         <div class="link-card"
              data-id="{{ link.id }}"
@@ -229,6 +233,8 @@
               {% elif "discord.com"     in link.url %}{% set icon = "fab fa-discord"     %}
               {% elif "skype.com"       in link.url %}{% set icon = "fab fa-skype"       %}
               {% elif "mastodon"        in link.url %}{% set icon = "fab fa-mastodon"    %}
+                {% elif "vsco"      in link.url %}{% set icon = "fas fa-camera-retro" %}
+
             {% endif %}
             <a class="link-button {{ user.template }}" href="#" onclick="return false;">
               {% if icon %}<i class="{{ icon }}"></i>{% endif %} {{ link.label }}
@@ -268,7 +274,7 @@
   </div>
 </div>
 
-{% if not current_user.is_premium %}
+{% if current_user.is_premium %}
   <a href="https://buy.stripe.com/fZu4gz1x6bx57675pGbEA00?client_reference_id={{ current_user.username }}&prefilled_email={{ current_user.email|urlencode }}"
      class="btn-stripe-premium">
     Skaffa Premium
