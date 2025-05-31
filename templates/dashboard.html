@@ -42,6 +42,7 @@
               {% elif "youtube"    in link.url %}{% set icon = "fab fa-youtube" %}
               {% elif "twitter"    in link.url %}{% set icon = "fab fa-twitter" %}
               {% elif "github"     in link.url %}{% set icon = "fab fa-github" %}
+              {% elif "snapchat" in link.url %}{% set icon = "fab fa-snapchat" %}
               {% elif "spotify.com"     in link.url %}{% set icon = "fab fa-spotify"     %}
               {% elif "soundcloud.com"  in link.url %}{% set icon = "fab fa-soundcloud"  %}
               {% elif "vimeo.com"       in link.url %}{% set icon = "fab fa-vimeo-v"     %}
@@ -155,11 +156,13 @@
              data-url="{{ link.url }}"
              data-icon="{{ icon }}"
              data-visible="{{ link.is_visible }}">
-          <form class="edit-link-form" style="display:none;">
-            <input type="text" name="label" value="{{ link.label }}" required>
-            <input type="url" name="url" value="{{ link.url }}" required>
-            <button type="submit">📂</button>
-          </form>
+              <form class="edit-link-form" style="display:none;" data-link-id="{{ link.id }}">
+                <input type="text" name="label" value="{{ link.label }}" required>
+                <input type="url" name="url" value="{{ link.url }}" required>
+                <button type="submit">📂</button>
+              </form>
+
+
           <div class="link-main">
             <div class="link-info">
               {% if icon %}<i class="{{ icon }}"></i>{% endif %}
@@ -312,6 +315,53 @@
 
 </style>
 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Edit-knapp visar formen
+  document.querySelectorAll('.edit-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const card = btn.closest('.link-card');
+      const form = card.querySelector('.edit-link-form');
+      form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+      card.querySelector('.link-main').style.display = (form.style.display === 'block') ? 'none' : 'flex';
+    });
+  });
+
+  // Edit-form AJAX-submit
+  document.querySelectorAll('.edit-link-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const linkId = form.dataset.linkId;
+      const label = form.querySelector('input[name="label"]').value.trim();
+      const url   = form.querySelector('input[name="url"]').value.trim();
+
+      fetch(`/edit_link_inline/${linkId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label: label, url: url })
+      })
+      .then(res => {
+        if (res.ok) {
+          // Dölj formen & visa raden igen (eller ladda om sidan om du vill)
+          form.style.display = 'none';
+          form.closest('.link-card').querySelector('.link-main').style.display = 'flex';
+          // Uppdatera label/url i raden:
+          form.closest('.link-card').querySelector('.link-label').textContent = label;
+          // Visa feedback (valfritt)
+        } else {
+          alert('Kunde inte spara länk!');
+        }
+      });
+    });
+  });
+});
+</script>
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -368,6 +418,10 @@ bindPop('openPhoneModalMobile', 'phoneModal','savePhone',    'phone_number', 'sh
     }
   });
 });
+
+
+
+
 </script>
 
 {% endblock %}
