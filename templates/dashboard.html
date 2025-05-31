@@ -269,11 +269,10 @@
 </div>
 
 {% if not current_user.is_premium %}
-  <script async src="https://js.stripe.com/v3/buy-button.js"></script>
-  <stripe-buy-button
-    buy-button-id="buy_btn_1RUa6jFtyUtnU3eLm3ab1Axx"
-    publishable-key="pk_live_51RUSDtFtyUtnU3eLv4nJM6yNMXKgylBizaoYGtIzcSGNhFnHyNOY1u0SRHIGxI6nI6EpzGRvZNRHn2v6DjXPgiUO00LR9a4iWD">
-  </stripe-buy-button>
+  <a href="https://buy.stripe.com/fZu4gz1x6bx57675pGbEA00?client_reference_id={{ current_user.username }}&prefilled_email={{ current_user.email|urlencode }}"
+     class="btn-stripe-premium">
+    Skaffa Premium
+  </a>
 {% endif %}
 
 

@@ -44,6 +44,13 @@
   </div>
 
 
+{% if not current_user.is_premium %}
+  <a href="https://buy.stripe.com/fZu4gz1x6bx57675pGbEA00?client_reference_id={{ current_user.username }}&prefilled_email={{ current_user.email|urlencode }}"
+     class="btn-stripe-premium">
+    Skaffa Premium
+  </a>
+{% endif %}
+
 
 
   <script>
