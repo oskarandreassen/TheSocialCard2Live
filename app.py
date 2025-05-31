@@ -99,20 +99,20 @@ def load_user(user_id):
 
 @app.before_request
 def require_login():
+    # 1. Tillåt Stripe webhook POST
+    if request.path == '/billing/webhook':
+        return
+
+    # 2. Övriga undantag – endpoints som ska vara publika
     exempt = {
         'auth.login', 'auth.register', 'auth.confirm_email',
         'auth.setup_email', 'public.public_profile', 'static'
     }
     if not current_user.is_authenticated and request.endpoint not in exempt:
+        # Logga gärna för felsökning:
+        # print(f"Blocked access to {request.endpoint} from {request.path}")
         return redirect(url_for('auth.login'))
 
-# ── Require login for protected routes ─────────────────────────────────
-@app.before_request
-def require_login():
-    exempt = {'auth.login', 'auth.register', 'public.public_profile', 'static'}
-    if not current_user.is_authenticated and request.endpoint not in exempt:
-        logger.debug(f"Blocked access to {request.endpoint}")
-        return redirect(url_for('auth.login'))
 
 # ── Register blueprints ───────────────────────────────────────────────
 from views.auth_routes      import auth
