@@ -16,7 +16,14 @@ class User(db.Model, UserMixin):
     theme_color      = db.Column(db.String(20), default='blue')
     template         = db.Column(db.String(50), default='default')
 
-    links            = db.relationship('Link', backref='user', lazy=True)
+    # Fixa relationen så bara user_id används här!
+    links = db.relationship(
+        'Link',
+        backref='user',
+        lazy=True,
+        foreign_keys='Link.user_id'
+    )
+
     show_links       = db.Column(db.Boolean, default=True)
     is_visible       = db.Column(db.Boolean, default=True)
 
@@ -29,20 +36,27 @@ class User(db.Model, UserMixin):
     email_token      = db.Column(db.String(36), nullable=True)
     email_sent_at    = db.Column(db.DateTime, nullable=True)
 
-    ##ADMIN VYN
+    # ADMIN
     is_admin    = db.Column(db.Boolean, default=False)
     nfc_sent    = db.Column(db.Boolean, default=False)
     created_at  = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     last_login  = db.Column(db.DateTime, nullable=True)
 
-    ## BETALNINGAR
+    # BETALNINGAR
     is_premium             = db.Column(db.Boolean, default=False, nullable=False)
     stripe_customer_id     = db.Column(db.String,  nullable=True)
     stripe_subscription_id = db.Column(db.String,  nullable=True)
 
+    # PUBLIC LINK OVERRIDE
+    main_public_link_id = db.Column(db.Integer, db.ForeignKey('link.id'), nullable=True)
+    main_public_link = db.relationship(
+        'Link',
+        uselist=False,
+        foreign_keys=[main_public_link_id]
+    )
+
     def __repr__(self):
         return f'<User {self.username}>'
-
 
     def generate_email_token(self):
         self.email_token = str(uuid.uuid4())
@@ -56,5 +70,4 @@ class Link(db.Model):
     url = db.Column(db.String(200))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     position = db.Column(db.Integer, default=0)
-    is_visible = db.Column(db.Boolean, default=True)  # 🆕 Lägg till detta!
-
+    is_visible = db.Column(db.Boolean, default=True)

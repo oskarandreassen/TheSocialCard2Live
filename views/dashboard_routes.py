@@ -123,3 +123,21 @@ def update_contact():
         current_user.show_phone   = data.get('show_phone', True)
     db.session.commit()
     return jsonify(success=True)
+
+
+@dashboard.route('/set_main_public_link/<int:link_id>', methods=['POST'])
+@login_required
+def set_main_public_link(link_id):
+    if not current_user.is_premium:
+        return "Premium krävs", 403
+
+    link = Link.query.get_or_404(link_id)
+    user = current_user
+    if user.main_public_link_id == link.id:
+        user.main_public_link_id = None
+    else:
+        user.main_public_link_id = link.id
+    db.session.commit()
+    return ('', 204)
+
+

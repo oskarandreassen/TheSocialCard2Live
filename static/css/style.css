@@ -768,3 +768,30 @@ body { font-family: Inter, Arial, sans-serif; padding: 0; }
 }
 
 
+/* ...dina övriga stilar... */
+.main-link-btn {
+  background: #e8e8ef;
+  color: #666;
+  border: none;
+  border-radius: 9px;
+  padding: 0.32em 1.2em;
+  margin-left: 0.3em;
+  font-weight: 500;
+  font-size: 1em;
+  box-shadow: 0 1px 3px rgba(50,70,150,0.07);
+  transition: all 0.14s;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.main-link-btn.selected,
+.main-link-btn[data-active="true"] {
+  background: #ffcf3f;
+  color: #222;
+  opacity: 1;
+  font-weight: bold;
+  box-shadow: 0 2px 7px rgba(220,180,40,0.12);
+}
+.main-link-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

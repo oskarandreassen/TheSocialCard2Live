@@ -156,13 +156,11 @@
              data-url="{{ link.url }}"
              data-icon="{{ icon }}"
              data-visible="{{ link.is_visible }}">
-              <form class="edit-link-form" style="display:none;" data-link-id="{{ link.id }}">
-                <input type="text" name="label" value="{{ link.label }}" required>
-                <input type="url" name="url" value="{{ link.url }}" required>
-                <button type="submit">📂</button>
-              </form>
-
-
+          <form class="edit-link-form" style="display:none;" data-link-id="{{ link.id }}">
+            <input type="text" name="label" value="{{ link.label }}" required>
+            <input type="url" name="url" value="{{ link.url }}" required>
+            <button type="submit">📂</button>
+          </form>
           <div class="link-main">
             <div class="link-info">
               {% if icon %}<i class="{{ icon }}"></i>{% endif %}
@@ -178,9 +176,30 @@
               <a href="#" class="link-btn edit-btn" title="Redigera">✏️</a>
               <a href="{{ url_for('dashboard.delete_link', link_id=link.id) }}"
                  class="link-btn" title="Radera">🗑️</a>
+
+               {# ——— Redirect av offentlig sida, krävs prem konto ——— #}
+                <form class="main-link-form" data-link-id="{{ link.id }}" style="display:inline;">
+                  {% if user.main_public_link_id == link.id %}
+                    <button type="button"
+                            class="main-link-btn selected"
+                            {% if not current_user.is_premium %} disabled {% endif %}
+                            title="Klicka för att avaktivera redirect">
+                      🌟 Offentlig
+                    </button>
+                  {% else %}
+                    <button type="button"
+                            class="main-link-btn"
+                            {% if not current_user.is_premium %} disabled {% endif %}
+                            title="Gör denna till din offentliga redirect">
+                      Offentlig
+                    </button>
+                  {% endif %}
+                </form>
+
             </div>
           </div>
         </div>
+
       {% endfor %}
     </div>
   </div>
@@ -286,6 +305,29 @@
 
 
 
+<div id="premium-popup" style="display:none; position:fixed; z-index:9999; left:0;top:0;width:100vw;height:100vh; background:rgba(0,0,0,0.35); align-items:center; justify-content:center;">
+  <div style="background:#fff; padding:2em 2em; border-radius:12px; box-shadow:0 3px 18px rgba(0,0,0,0.11); max-width:360px; margin:auto; text-align:center;">
+    <h3>Bli premium!</h3>
+    <p>Att välja offentlig redirect är en premiumfunktion.<br>Uppgradera för att låsa upp!</p>
+    <a href="https://buy.stripe.com/fZu4gz1x6bx57675pGbEA00?client_reference_id={{ current_user.username }}&prefilled_email={{ current_user.email|urlencode }}"
+       class="btn-stripe-premium" style="margin: 1em 0;display:inline-block;">
+      Skaffa Premium
+    </a><br>
+    <button onclick="hidePremiumPopup()" style="margin-top:0.7em; background:#f3f3f3; border:none; padding:0.5em 1.5em; border-radius:6px;">Stäng</button>
+  </div>
+</div>
+<script>
+function showPremiumPopup() {
+  document.getElementById('premium-popup').style.display = 'flex';
+}
+function hidePremiumPopup() {
+  document.getElementById('premium-popup').style.display = 'none';
+}
+</script>
+
+
+
+
 <style>
   /* Responsivt */
   @media (max-width:600px){ .desktop-only{display:none!important;} .mobile-only{display:flex!important;justify-content:center;} .preview-panel{display:none!important;} }
@@ -357,6 +399,45 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.main-link-form').forEach(form => {
+    const btn = form.querySelector('button');
+    btn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      const linkId = form.getAttribute('data-link-id');
+      if (!linkId) {
+        alert('Kunde inte läsa ut länk-id!');
+        return false;
+      }
+
+      {% if not current_user.is_premium %}
+        showPremiumPopup();
+        return false;
+      {% endif %}
+
+      try {
+        let response = await fetch(`/set_main_public_link/${linkId}`, {method: "POST"});
+        if (response.ok) {
+          document.querySelectorAll('.main-link-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          document.querySelectorAll('.main-link-btn').forEach(b => b.innerText = "Offentlig");
+          btn.innerText = "🌟 Offentlig";
+        } else if (response.status === 403) {
+          showPremiumPopup();
+        } else {
+          alert('Kunde inte uppdatera redirect. Testa igen!');
+        }
+      } catch (e) {
+        alert('Något gick fel, testa igen');
+      }
+    });
+  });
+});
+
 </script>
 
 
