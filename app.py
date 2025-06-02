@@ -17,6 +17,7 @@ from billing import billing
 from dotenv import load_dotenv
 load_dotenv()      # läser in .env i miljön
 
+from flask import Blueprint, send_from_directory, current_app
 
 
 
@@ -34,7 +35,7 @@ app = Flask(
 
 
 # … efter app = Flask(…)
-app.config['REMEMBER_COOKIE_DURATION'] = timedelta(minutes=5)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
 
 app.config.update(
   MAIL_SERVER        = 'smtp.strato.com',
@@ -62,7 +63,16 @@ app.register_blueprint(billing, url_prefix='/billing')
 # ── Configuration ─────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'din-superhemliga-nyckel')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+import os
+
+if os.environ.get("RENDER") == "1":
+    UPLOAD_FOLDER = '/user/data/uploads'
+else:
+    UPLOAD_FOLDER = os.path.join('static', 'uploads')
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 # ── Ensure instance folder exists ─────────────────────────────────────
 os.makedirs(app.instance_path, exist_ok=True)
@@ -91,6 +101,14 @@ migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'auth.login'
 login_manager.login_message = "Du måste logga in för att se den här sidan."
+
+
+from flask import send_from_directory
+
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    upload_folder = app.config['UPLOAD_FOLDER']
+    return send_from_directory(upload_folder, filename)
 
 @login_manager.user_loader
 def load_user(user_id):

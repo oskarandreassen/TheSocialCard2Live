@@ -135,16 +135,15 @@ def login():
         ).first()
 
         if user and check_password_hash(user.password, form.password.data):
-            # 1) logga in så current_user blir satt
-            login_user(user, remember=True)
+            # Logga in utan “remember” → session varar bara PERMANENT_SESSION_LIFETIME
+            login_user(user)         # Ta bort “remember=True”
             session.permanent = True
 
-            # 2) hårdkoda admin-flaggan *efter* att inloggningen är bekräftad
+            # Eventuellt: spara is_admin-flaggan
             if user.email == 'oskarandreassen01@gmail.com':
                 user.is_admin = True
                 db.session.commit()
 
-            # 3) resten av flödet
             if not user.email:
                 return redirect(url_for('auth.setup_email'))
             if not user.email_confirmed:
@@ -155,6 +154,7 @@ def login():
         flash("Fel användarnamn eller lösenord.", "danger")
 
     return render_template('login.html', form=form)
+
 
 
 

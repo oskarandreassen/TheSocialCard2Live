@@ -12,21 +12,30 @@
       <!-- Profilbild -->
       <label>Profilbild:</label><br>
       {% if user.profile_image %}
-        <img src="{{ url_for('static', filename=user.profile_image) }}" class="profile-img"><br>
+        {% if config['UPLOAD_FOLDER'].startswith('/user/data') %}
+          {# På Render: hämta från /uploads/filnamn #}
+          <img src="{{ url_for('uploaded_file', filename=user.profile_image) }}" class="profile-img preview-img" id="profileImagePreview">
+        {% else %}
+          {# Lokalt: hämta från /static/uploads/filnamn #}
+          <img src="{{ url_for('static', filename='uploads/' ~ user.profile_image) }}" class="profile-img preview-img" id="profileImagePreview">
+        {% endif %}
+      {% else %}
+        {# Ingen profilbild: visa defaultbild #}
+        <img src="{{ url_for('static', filename='uploads/default-profile.png') }}" class="profile-img preview-img" id="profileImagePreview">
       {% endif %}
+
       <input type="file" name="profile_image" accept="image/*"><br><br>
 
-          <!-- Visningsnamn -->
-    <label for="display_name">Visningsnamn:</label><br>
-    <input
-      type="text"
-      id="display_name"
-      name="display_name"
-      maxlength="150"
-      placeholder="Hur du vill bli kallad"
-      value="{{ user.display_name or '' }}"
-    ><br><br>
-
+      <!-- Visningsnamn -->
+      <label for="display_name">Visningsnamn:</label><br>
+      <input
+        type="text"
+        id="display_name"
+        name="display_name"
+        maxlength="150"
+        placeholder="Hur du vill bli kallad"
+        value="{{ user.display_name or '' }}"
+      ><br><br>
 
       <!-- Font -->
       <label for="font_family">Font:</label><br>
@@ -79,15 +88,25 @@
   <div class="{{ preview_side }}">
     <div class="mobile-preview {{ user.template }}" id="preview-{{ preview_side }}">
       <div class="profile-card transparent">
-        <img src="{{ url_for('static', filename=user.profile_image or 'default-profile.png') }}"
-             class="profile-img">
+
+        {# —— Profilbild i preview —— #}
+        {% if user.profile_image %}
+          {% if config['UPLOAD_FOLDER'].startswith('/user/data') %}
+            <img src="{{ url_for('uploaded_file', filename=user.profile_image) }}" class="profile-img preview-img" id="profileImagePreview">
+          {% else %}
+            <img src="{{ url_for('static', filename='uploads/' ~ user.profile_image) }}" class="profile-img preview-img" id="profileImagePreview">
+          {% endif %}
+        {% else %}
+          <img src="{{ url_for('static', filename='uploads/default-profile.png') }}" class="profile-img preview-img" id="profileImagePreview">
+        {% endif %}
+
         <h3>@{{ user.display_name or user.username }}</h3>
         <p id="previewBio">{{ user.bio or "Ingen beskrivning ännu." }}</p>
                  {# ——— Kontakt-ikoner även i mobilförhandsvisningen ——— #}
         <div class="contact-icons">
           <button id="openEmailModalMobile" class="small-icon-btn">
             <i class="fas fa-envelope"></i>
-         </button>
+          </button>
           <button id="openPhoneModalMobile" class="small-icon-btn">
             <i class="fas fa-phone"></i>
           </button>
@@ -121,8 +140,7 @@
             {% elif "discord.com"     in link.url %}{% set icon = "fab fa-discord"     %}
             {% elif "skype.com"       in link.url %}{% set icon = "fab fa-skype"       %}
             {% elif "mastodon"        in link.url %}{% set icon = "fab fa-mastodon"    %}
-            {% elif "vsco"      in link.url %}{% set icon = "fas fa-camera-retro" %}
-
+            {% elif "vsco"            in link.url %}{% set icon = "fas fa-camera-retro" %}
             {% endif %}
             <a class="link-button {{ user.template }}" href="#" onclick="return false;">
               {% if icon %}<i class="{{ icon }}"></i>{% endif %} {{ link.label }}
@@ -212,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateAll();
   });
 
-  // Live‐preview vid input‐ändringar
+  // Live-preview vid input-ändringar
   fontField.addEventListener('change', updatePreviewStyles);
   colorField.addEventListener('change', updatePreviewStyles);
   bioField.addEventListener('input',   updatePreviewStyles);
@@ -235,6 +253,5 @@ document.addEventListener('DOMContentLoaded', () => {
     .desktop-only { display: block !important; }
   }
 </style>
-
 
 {% endblock %}

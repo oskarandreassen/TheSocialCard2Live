@@ -3,8 +3,21 @@
 {% block content %}
 <div class="profile-card {{ user.template }}"
      style="font-family: {{ user.font_family }}; color: {{ user.theme_color }};">
-  <img src="{{ url_for('static', filename=user.profile_image or 'default-profile.png') }}"
-       class="profile-img">
+
+  {# —— Profilbild —— #}
+  {% if user.profile_image %}
+    {% if config['UPLOAD_FOLDER'].startswith('/user/data') %}
+      {# På Render: hämta från /uploads/filnamn #}
+      <img src="{{ url_for('uploaded_file', filename=user.profile_image) }}" class="profile-img">
+    {% else %}
+      {# Lokalt: hämta från /static/uploads/filnamn #}
+      <img src="{{ url_for('static', filename='uploads/' ~ user.profile_image) }}" class="profile-img">
+    {% endif %}
+  {% else %}
+    {# Ingen profilbild: visa default‐bild #}
+    <img src="{{ url_for('static', filename='uploads/default-profile.png') }}" class="profile-img">
+  {% endif %}
+
   <h2>@{{ user.display_name or user.username }}</h2>
   <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
 
@@ -34,8 +47,8 @@
       {% elif "slack.com"      in link.url %}{% set icon = "fab fa-slack"      %}
       {% elif "discord.com"    in link.url %}{% set icon = "fab fa-discord"    %}
       {% elif "skype.com"      in link.url %}{% set icon = "fab fa-skype"      %}
-      {% elif "vsco"      in link.url %}{% set icon = "fas fa-camera-retro" %}
-      {% elif "mastodon"  in link.url %}{% set icon = "fab fa-mastodon" %}
+      {% elif "vsco"           in link.url %}{% set icon = "fas fa-camera-retro" %}
+      {% elif "mastodon"       in link.url %}{% set icon = "fab fa-mastodon"    %}
       {% endif %}
       <a class="link-button {{ user.template }}" href="{{ link.url }}" target="_blank">
         {% if icon %}<i class="{{ icon }}"></i>{% endif %}
@@ -44,15 +57,12 @@
     {% endfor %}
   </div>
 
-
 {% if not current_user.is_premium %}
   <a href="https://buy.stripe.com/fZu4gz1x6bx57675pGbEA00?client_reference_id={{ current_user.username }}&prefilled_email={{ current_user.email|urlencode }}"
      class="btn-stripe-premium">
     Skaffa Premium
   </a>
 {% endif %}
-
-
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
