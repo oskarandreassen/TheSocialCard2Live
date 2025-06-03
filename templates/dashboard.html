@@ -2,7 +2,6 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 
-
 <div class="dashboard-layout">
 
   <!-- 🎛️ DASHBOARD PANEL I MITTEN -->
@@ -195,29 +194,27 @@
               <a href="{{ url_for('dashboard.delete_link', link_id=link.id) }}"
                  class="link-btn" title="Radera">🗑️</a>
 
-               {# ——— Redirect av offentlig sida, krävs prem konto ——— #}
-                <form class="main-link-form" data-link-id="{{ link.id }}" style="display:inline;">
-                  {% if user.main_public_link_id == link.id %}
-                    <button type="button"
-                            class="main-link-btn selected"
-                            {% if not current_user.is_premium %} disabled {% endif %}
-                            title="Klicka för att avaktivera redirect">
-                      🌟 Offentlig
-                    </button>
-                  {% else %}
-                    <button type="button"
-                            class="main-link-btn"
-                            {% if not current_user.is_premium %} disabled {% endif %}
-                            title="Gör denna till din offentliga redirect">
-                      Offentlig
-                    </button>
-                  {% endif %}
-                </form>
-
+              {# ——— Redirect av offentlig sida, krävs prem konto ——— #}
+              <form class="main-link-form" data-link-id="{{ link.id }}" style="display:inline;">
+                {% if user.main_public_link_id == link.id %}
+                  <button type="button"
+                          class="main-link-btn selected"
+                          {% if not current_user.is_premium %} disabled {% endif %}
+                          title="Klicka för att avaktivera redirect">
+                    🌟 Offentlig
+                  </button>
+                {% else %}
+                  <button type="button"
+                          class="main-link-btn"
+                          {% if not current_user.is_premium %} disabled {% endif %}
+                          title="Gör denna till din offentliga redirect">
+                    Offentlig
+                  </button>
+                {% endif %}
+              </form>
             </div>
           </div>
         </div>
-
       {% endfor %}
     </div>
   </div>
@@ -244,7 +241,7 @@
         <h3>@{{ user.display_name or user.username }}</h3>
         <p>{{ user.bio or "Ingen beskrivning ännu." }}</p>
          {# ——— Kontakt‐ikoner även i mobilförhandsvisningen ——— #}
-                <div class="contact-icons">
+        <div class="contact-icons">
           {% if user.show_email %}
             <a href="mailto:{{ user.email }}" class="small-icon-btn">
               <i class="fas fa-envelope"></i>
@@ -323,31 +320,59 @@
   </div>
 </div>
 
+{# ——— Stripe‐knapp för att skapa Checkout Session ——— #}
 {% if not current_user.is_premium %}
-  <a href="https://buy.stripe.com/fZu4gz1x6bx57675pGbEA00?client_reference_id={{ current_user.username }}&prefilled_email={{ current_user.email|urlencode }}"
-     class="btn-stripe-premium">
+  <button id="checkout-button" class="btn-stripe-premium">
     Skaffa Premium
-  </a>
+  </button>
 {% endif %}
 
-<div id="premium-popup" style="display:none; position:fixed; z-index:9999; left:0;top:0;width:100vw;height:100vh; background:rgba(0,0,0,0.35); align-items:center; justify-content:center;">
-  <div style="background:#fff; padding:2em 2em; border-radius:12px; box-shadow:0 3px 18px rgba(0,0,0,0.11); max-width:360px; margin:auto; text-align:center;">
+{# ——— Popup om användaren inte är premium men försöker välja redirect ——— #}
+<div id="premium-popup" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.35); align-items:center; justify-content:center;">
+  <div style="background:#fff; padding:2em; border-radius:12px; box-shadow:0 3px 18px rgba(0,0,0,0.11); max-width:360px; margin:auto; text-align:center;">
     <h3>Bli premium!</h3>
     <p>Att välja offentlig redirect är en premiumfunktion.<br>Uppgradera för att låsa upp!</p>
-    <a href="https://buy.stripe.com/fZu4gz1x6bx57675pGbEA00?client_reference_id={{ current_user.username }}&prefilled_email={{ current_user.email|urlencode }}"
-       class="btn-stripe-premium" style="margin: 1em 0;display:inline-block;">
+    <button id="checkout-button-popup" class="btn-stripe-premium" style="margin: 1em 0; display:inline-block;">
       Skaffa Premium
-    </a><br>
-    <button onclick="hidePremiumPopup()" style="margin-top:0.7em; background:#f3f3f3; border:none; padding:0.5em 1.5em; border-radius:6px;">Stäng</button>
+    </button><br>
+    <button onclick="hidePremiumPopup()" style="margin-top:0.7em; background:#f3f3f3; border:none; padding:0.5em 1.5em; border-radius:6px;">
+      Stäng
+    </button>
   </div>
 </div>
+
 <script>
-function showPremiumPopup() {
-  document.getElementById('premium-popup').style.display = 'flex';
-}
-function hidePremiumPopup() {
-  document.getElementById('premium-popup').style.display = 'none';
-}
+  function showPremiumPopup() {
+    document.getElementById('premium-popup').style.display = 'flex';
+  }
+  function hidePremiumPopup() {
+    document.getElementById('premium-popup').style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('checkout-button');
+    const btnPopup = document.getElementById('checkout-button-popup');
+
+    async function createCheckout() {
+      // Ajax‐kall till backend som skapar en Stripe Checkout Session
+      const res = await fetch("{{ url_for('billing.create_checkout_session') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: "{{ current_user.id }}" })
+      });
+      if (!res.ok) {
+        // Om det blir fel – visa en beskrivning eller popup
+        alert("Något gick fel när vi skapade betalningssessionen. Försök igen.");
+        return;
+      }
+      const data = await res.json();      // { sessionId: "…" }
+      const stripe = Stripe("{{ stripe_public_key }}"); // public key från din billing.py
+      await stripe.redirectToCheckout({ sessionId: data.sessionId });
+    }
+
+    if (btn)      btn.addEventListener("click", createCheckout);
+    if (btnPopup) btnPopup.addEventListener("click", createCheckout);
+  });
 </script>
 
 <style>
@@ -359,11 +384,11 @@ function hidePremiumPopup() {
   .contact-icons{ display:flex; gap:1rem; justify-content:center; margin:1rem 0; }
   .small-icon-btn{ background:none!important; border:none!important; box-shadow:none!important; padding:.5rem!important; width:auto!important; font-size:1.5rem; cursor:pointer; color: #000!important;}
 
-  /* Modal */
-  .modal{ display:none; position:fixed;top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,.5); align-items:center; justify-content:center; z-index:1000; }
+  /* Modal (popups) */
+  .modal{ display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.5); align-items:center; justify-content:center; z-index:1000; }
   .modal.active{ display:flex; }
-  .modal-content{ background:#fff; padding:1.5rem; border-radius:8px; width:90%;max-width:360px; position:relative; }
-  .modal-close{ position:absolute;top:.5rem;right:.5rem; background:none;border:none;font-size:1.25rem;cursor:pointer; }
+  .modal-content{ background:#fff; padding:1.5rem; border-radius:8px; width:90%; max-width:360px; position:relative; }
+  .modal-close{ position:absolute; top:.5rem; right:.5rem; background:none; border:none; font-size:1.25rem; cursor:pointer; }
 
   /* Gör “×”-knappen liten, svart och utan blå bakgrund */
   .modal-close {
@@ -376,7 +401,6 @@ function hidePremiumPopup() {
     cursor: pointer;
   }
 </style>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -406,7 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .then(res => {
         if (res.ok) {
-          // Dölj formen & visa raden igen (eller ladda om sidan om du vill)
+          // Dölj formen & visa raden igen
           form.style.display = 'none';
           form.closest('.link-card').querySelector('.link-main').style.display = 'flex';
           // Uppdatera label/url i raden:
@@ -419,7 +443,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -445,12 +468,12 @@ document.addEventListener('DOMContentLoaded', function() {
         let response = await fetch(`/set_main_public_link/${linkId}`, { method: "POST" });
         if (response.ok) {
 
-          // Om den var markerad (selected), så avmarkerar vi
           if (currentlySelected) {
+            // Om den var markerad, avmarkera
             btn.classList.remove('selected');
             btn.innerText = "Offentlig";
           } else {
-            // Om den var avmarkerad, så markerar vi (tog bort på alla + satte på den här)
+            // Annars markera den nya och ta bort alla andra markeringar
             document.querySelectorAll('.main-link-btn').forEach(b => {
               b.classList.remove('selected');
               b.innerText = "Offentlig";
@@ -472,15 +495,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // Sortable + inline‐edit…
-
-  // Pop‐up binds
+  // Pop‐up binds för e‐post & telefon
   function bindPop(btnId, modalId, saveId, field, showField) {
     const btn   = document.getElementById(btnId),
           modal = document.getElementById(modalId),
@@ -517,8 +535,8 @@ document.addEventListener('DOMContentLoaded', () => {
   bindPop('openPhoneModal', 'phoneModal', 'savePhone',       'phone_number', 'show_phone');
 
   // Mobila edit‐knappar
-  bindPop('openEmailModalMobile', 'emailModal','saveEmail', 'email',        'show_email');
-  bindPop('openPhoneModalMobile', 'phoneModal','savePhone', 'phone_number', 'show_phone');
+  bindPop('openEmailModalMobile', 'emailModal','saveEmail',    'email',        'show_email');
+  bindPop('openPhoneModalMobile', 'phoneModal','savePhone',    'phone_number', 'show_phone');
 
   // Lägg till‐modal
   const addModal = document.getElementById('addModal');

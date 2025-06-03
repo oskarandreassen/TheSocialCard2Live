@@ -12,7 +12,12 @@ from models import db, User
 from datetime import timedelta
 from flask_mail import Mail, Message
 
+from flask import Flask
+from flask_mail import Mail
+
 from billing import billing
+
+
 
 from dotenv import load_dotenv
 load_dotenv()      # läser in .env i miljön
@@ -32,6 +37,12 @@ app = Flask(
     template_folder='templates',
     static_folder='static'
 )
+
+mail = Mail(app)
+
+# app.py (viktigast: längst ner eller där du registrerar andra blueprints)
+from billing import billing
+app.register_blueprint(billing)  # prefix är redan satt i billing.py som '/billing'
 
 
 # … efter app = Flask(…)
@@ -53,16 +64,16 @@ exempt = {'auth.login', 'auth.register', 'auth.confirm_email',
 from admin import admin_bp
 app.register_blueprint(admin_bp)
 
-from billing import billing
-
-
-# Registrera billing-blueprint med prefix "/billing"
-app.register_blueprint(billing, url_prefix='/billing')
-
 
 # ── Configuration ─────────────────────────────────────────────────────
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'din-superhemliga-nyckel')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# ⮕ Lägg till just denna rad, så att konfigen från .env hamnar i app.config:
+app.config['STRIPE_SECRET_KEY']    = os.getenv('STRIPE_SECRET_KEY')
+app.config['STRIPE_PUBLISHABLE_KEY'] = os.getenv('STRIPE_PUBLISHABLE_KEY')
+app.config['STRIPE_PRICE_ID']       = os.getenv('STRIPE_PRICE_ID')
+
 import os
 
 if os.environ.get("RENDER") == "1":
@@ -174,7 +185,6 @@ def stripe_webhook():
             user.stripe_subscription_id = sess.get('subscription')
             db.session.commit()
     return '', 200
-
 
 
 # ── Run server ────────────────────────────────────────────────────────

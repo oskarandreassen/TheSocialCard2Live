@@ -4,6 +4,10 @@ from models import db, Link
 from forms import ProfileForm
 from flask import flash
 
+from flask import current_app, render_template
+from flask_login import login_required, current_user
+from models import Link
+
 
 dashboard = Blueprint('dashboard', __name__)
 
@@ -39,7 +43,9 @@ def dashboard_view():
         'dashboard.html',
         user=current_user,
         sorted_links=sorted_links,
-        form=form
+        form=form,
+        stripe_public_key = current_app.config['STRIPE_PUBLISHABLE_KEY']
+
     )
 
 

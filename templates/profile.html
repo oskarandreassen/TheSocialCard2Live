@@ -58,11 +58,59 @@
   </div>
 
 {% if not current_user.is_premium %}
-  <a href="https://buy.stripe.com/fZu4gz1x6bx57675pGbEA00?client_reference_id={{ current_user.username }}&prefilled_email={{ current_user.email|urlencode }}"
-     class="btn-stripe-premium">
+  <button id="checkout-button" class="btn-stripe-premium">
     Skaffa Premium
-  </a>
+  </button>
 {% endif %}
+
+<div id="premium-popup" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.35); align-items:center; justify-content:center;">
+  <div style="background:#fff; padding:2em; border-radius:12px; box-shadow:0 3px 18px rgba(0,0,0,0.11); max-width:360px; margin:auto; text-align:center;">
+    <h3>Bli premium!</h3>
+    <p>Att välja offentlig redirect är en premiumfunktion.<br>Uppgradera för att låsa upp!</p>
+    <button id="checkout-button-popup" class="btn-stripe-premium" style="margin: 1em 0; display:inline-block;">
+      Skaffa Premium
+    </button><br>
+    <button onclick="hidePremiumPopup()" style="margin-top:0.7em; background:#f3f3f3; border:none; padding:0.5em 1.5em; border-radius:6px;">
+      Stäng
+    </button>
+  </div>
+</div>
+
+<script>
+  function showPremiumPopup() {
+    document.getElementById('premium-popup').style.display = 'flex';
+  }
+  function hidePremiumPopup() {
+    document.getElementById('premium-popup').style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('checkout-button');
+    const btnPopup = document.getElementById('checkout-button-popup');
+
+    async function createCheckout() {
+      // Ajax‐kall till backend som skapar en Stripe Checkout Session
+      const res = await fetch("{{ url_for('billing.create_checkout_session') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: "{{ current_user.id }}" })
+      });
+      if (!res.ok) {
+        // Om det blir fel (t.ex. 403) – visa en beskrivning eller popup
+        alert("Något gick fel när vi skapade betalningssessionen. Försök igen.");
+        return;
+      }
+      const data = await res.json();      // { sessionId: "…" }
+      const stripe = Stripe("{{ stripe_public_key }}"); // genereras i billing.py via render_template
+      await stripe.redirectToCheckout({ sessionId: data.sessionId });
+    }
+
+    if (btn)     btn.addEventListener("click", createCheckout);
+    if (btnPopup) btnPopup.addEventListener("click", createCheckout);
+  });
+</script>
+
+
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
