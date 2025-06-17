@@ -61,7 +61,15 @@
         <td>{% if u.nfc_sent %}<span class="status-check">✔</span>{% else %}<span class="status-cross">–</span>{% endif %}</td>
         <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
         <td><a href="{{ url_for('public.public_profile', username=u.username) }}" target="_blank">Visa</a></td>
-        <td><a href="{{ url_for('admin.user_detail', user_id=u.id) }}">Detaljer</a></td>
+        <td>
+            <a href="{{ url_for('admin.user_detail', user_id=u.id) }}">Detaljer</a>
+            <form action="{{ url_for('admin.delete_user', user_id=u.id) }}"
+                  method="post"
+                  style="display:inline"
+                  onsubmit="return confirm('Är du säker på att du vill radera {{ u.username }}?');">
+              <button type="submit" class="link-button">Ta bort</button>
+            </form>
+          </td>
       </tr>
     {% endfor %}
     </tbody>

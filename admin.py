@@ -127,3 +127,18 @@ def stop_impersonate():
         login_user(admin)
         flash('Återgick till admin-konto', 'info')
     return redirect(url_for('admin.index'))
+
+
+
+@admin_bp.route('/user/<int:user_id>/delete', methods=['POST'])
+@admin_required
+def delete_user(user_id):
+    # Hämta och radera
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash("Du kan inte ta bort ditt eget konto.", "warning")
+        return redirect(url_for('admin.index'))
+    db.session.delete(user)
+    db.session.commit()
+    flash(f"Användaren {user.username} har raderats.", "success")
+    return redirect(url_for('admin.index'))

@@ -9,11 +9,13 @@ from flask_login import LoginManager, current_user
 from flask_migrate import Migrate, upgrade as migrate_upgrade
 from sqlalchemy import inspect as sa_inspect
 from models import db, User
-from datetime import timedelta
+from datetime import timedelta, datetime
 from flask_mail import Mail, Message
 
 from flask import Flask
 from flask_mail import Mail
+
+
 
 from billing import billing
 
@@ -59,7 +61,9 @@ app.config.update(
 mail = Mail(app)
 
 exempt = {'auth.login', 'auth.register', 'auth.confirm_email',
-          'auth.resend_confirm', 'auth.setup_email', 'public.public_profile', 'static'}
+          'auth.resend_confirm', 'auth.setup_email', 'public.public_profile', 'static',
+          'uploaded_file'
+          }
 
 from admin import admin_bp
 app.register_blueprint(admin_bp)
@@ -116,6 +120,26 @@ login_manager.login_message = "Du måste logga in för att se den här sidan."
 
 from flask import send_from_directory
 
+from flask_apscheduler import APScheduler
+from tasks import purge_unconfirmed
+
+class Config:
+    SCHEDULER_API_ENABLED = True
+
+app.config.from_object(Config)
+scheduler = APScheduler()
+scheduler.init_app(app)
+# Kör första gången direkt, därefter var 10:e dag
+scheduler.add_job(
+    id='purge_unconfirmed',
+    func=purge_unconfirmed,
+    trigger='interval',
+    days=10,
+    next_run_time=datetime.utcnow()
+)
+scheduler.start()
+
+
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     upload_folder = app.config['UPLOAD_FOLDER']
@@ -135,7 +159,8 @@ def require_login():
     # 2. Övriga undantag – endpoints som ska vara publika
     exempt = {
         'auth.login', 'auth.register', 'auth.confirm_email',
-        'auth.setup_email', 'public.public_profile', 'static'
+        'auth.setup_email', 'public.public_profile', 'static',
+        'uploaded_file'
     }
     if not current_user.is_authenticated and request.endpoint not in exempt:
         # Logga gärna för felsökning:
