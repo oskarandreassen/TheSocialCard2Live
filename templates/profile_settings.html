@@ -60,12 +60,7 @@
       <label for="bio">Beskrivning:</label><br>
       <textarea name="bio" id="bioInput" rows="3">{{ user.bio or '' }}</textarea><br><br>
 
-      <!-- Template-väljare -->
-      <h3>Välj Mall:</h3>
-      <div class="template-nav">
-        <button id="prevBtn" type="button">⬅️</button>
-        <button id="nextBtn" type="button">➡️</button>
-      </div>
+
 
       <div class="template-slider" id="template-slider">
         {% set base_templates = ['default','elegant','dark','neon','sun','rainbow'] %}
@@ -82,6 +77,13 @@
           <div class="preview">{{ name|capitalize }}</div>
         </label>
         {% endfor %}
+      </div>
+
+      <!-- Template-väljare -->
+      <h3>Välj Mall:</h3>
+      <div class="template-nav">
+        <button id="prevBtn" type="button">⬅️</button>
+        <button id="nextBtn" type="button">➡️</button>
       </div>
 
       <br><br>
