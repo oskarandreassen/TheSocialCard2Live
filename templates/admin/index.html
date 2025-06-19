@@ -8,7 +8,7 @@
   <div><strong>Bekräftade email:</strong> {{ confirmed_emails }}</div>
   <div><strong>Bekräftade telefoner:</strong> {{ confirmed_phones }}</div>
   <div><strong>NFC skickade:</strong> {{ nfc_sent_count }}</div>
-    <div><strong>Nästa rensning:</strong> {{ time_until_purge }}</div>
+  <div><strong>Nästa rensning:</strong> {{ time_until_purge }}</div>
   <form action="{{ url_for('admin.run_purge') }}" method="post" style="display:inline">
     <button type="submit">Rensa nu</button>
   </form>

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, session, send_file
 from flask_login import login_required, current_user, login_user
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app import db, scheduler
 from models import User
 from tasks import purge_unconfirmed
@@ -60,14 +60,13 @@ def index():
     # Hur länge tills obekräftade konton rensas
     job = scheduler.get_job('purge_unconfirmed')
     if job and job.next_run_time:
-        remaining = job.next_run_time - datetime.utcnow()
+        remaining = job.next_run_time - datetime.now(timezone.utc)
         days = remaining.days
         hours, rem = divmod(remaining.seconds, 3600)
         minutes = rem // 60
         time_until_purge = f"{days}d {hours}h {minutes}m"
     else:
         time_until_purge = 'N/A'
-
 
     return render_template('admin/index.html',
         total_users=total_users,

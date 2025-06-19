@@ -76,8 +76,8 @@ limiter = Limiter(
 limiter.init_app(app)
 
 
-from admin import admin_bp
-app.register_blueprint(admin_bp)
+#from admin import admin_bp
+#app.register_blueprint(admin_bp)
 
 
 # ── Configuration ─────────────────────────────────────────────────────
@@ -150,6 +150,8 @@ scheduler.add_job(
 )
 scheduler.start()
 
+from admin import admin_bp
+app.register_blueprint(admin_bp)
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
