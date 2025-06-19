@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, session, send_file
 from flask_login import login_required, current_user, login_user
 from datetime import datetime, timedelta
-from app import db
+from app import db, scheduler
 from models import User
+from tasks import purge_unconfirmed
 import csv, io
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -53,9 +54,20 @@ def index():
         users_q = users_q.filter_by(is_admin=(filter_admin=='yes'))
 
     # Sortera fallande på registreringsdatum
-    # ⚠️ Här är ändringen: alla argument som keyword-only:
     paginated = users_q.order_by(User.created_at.desc()) \
                        .paginate(page=page, per_page=20, error_out=False)
+
+    # Hur länge tills obekräftade konton rensas
+    job = scheduler.get_job('purge_unconfirmed')
+    if job and job.next_run_time:
+        remaining = job.next_run_time - datetime.utcnow()
+        days = remaining.days
+        hours, rem = divmod(remaining.seconds, 3600)
+        minutes = rem // 60
+        time_until_purge = f"{days}d {hours}h {minutes}m"
+    else:
+        time_until_purge = 'N/A'
+
 
     return render_template('admin/index.html',
         total_users=total_users,
@@ -67,7 +79,8 @@ def index():
         pagination=paginated,
         q=q,
         filter_email=filter_email,
-        filter_admin=filter_admin
+        filter_admin=filter_admin,
+        time_until_purge=time_until_purge
     )
 
 
@@ -116,6 +129,15 @@ def export_csv():
                      mimetype='text/csv',
                      as_attachment=True,
                      download_name='users_export.csv')
+
+
+@admin_bp.route('/run-purge', methods=['POST'])
+@admin_required
+def run_purge():
+    purge_unconfirmed()
+    flash('Rensning genomförd', 'success')
+    return redirect(url_for('admin.index'))
+
 
 
 @admin_bp.route('/impersonate/stop')
