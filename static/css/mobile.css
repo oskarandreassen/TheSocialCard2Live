@@ -191,13 +191,21 @@
   .mobile-preview.sun      .link-button {
     background: #f9c667; color: #333; box-shadow: none;
   }
-  .mobile-preview.graffiti .link-button {
-    background: rgba(255,255,255,0.2); color: #fff; box-shadow: none;
-  }
   .mobile-preview.rainbow  .link-button {
     background-image: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet);
     color: #fff; box-shadow: none;
   }
+
+  .mobile-preview.ocean    .link-button { background: #0077cc; color: #fff; box-shadow: none; }
+  .mobile-preview.forest   .link-button { background: #228b22; color: #fff; box-shadow: none; }
+  .mobile-preview.midnight .link-button { background: #1a2a6c; color: #fff; box-shadow: none; }
+  .mobile-preview.candy    .link-button { background: #ff69b4; color: #fff; box-shadow: none; }
+  .mobile-preview.pastel   .link-button { background: #ffbebe; color: #333; box-shadow: none; }
+  .mobile-preview.monochrome .link-button { background: #333; color: #fff; box-shadow: none; }
+  .mobile-preview.retro    .link-button { background: #ffa500; color: #fff; box-shadow: none; }
+  .mobile-preview.sunset   .link-button { background: #ff4500; color: #fff; box-shadow: none; }
+  .mobile-preview.jungle   .link-button { background: #3b7045; color: #fff; box-shadow: none; }
+  .mobile-preview.glass    .link-button { background: rgba(255,255,255,0.4); color: #333; box-shadow: none; }
 
   /* ─── 10) Centered Forms ─────────────────────────────────────────── */
   .container form {

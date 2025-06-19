@@ -384,8 +384,19 @@ body.elegant { background: linear-gradient(to bottom,#e0eafc,#cfdef3); }
 body.dark    { background: #1c1c1c; color: #f9f9f9; }
 body.neon    { background: linear-gradient(to right,#0f0c29,#302b63,#24243e); color: #0ff; }
 body.sun     { background: linear-gradient(to bottom,#fffbd5,#f9c667); }
-body.graffiti{ background: url('/static/bg-graffiti.jpg') center/cover no-repeat; background-size: cover; color: #fff; }
+
 body.rainbow { background: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); color: #fff; }
+body.ocean    { background: linear-gradient(to bottom,#00aaff,#004477); color:#fff; }
+body.forest   { background: linear-gradient(to bottom,#2e8b57,#013220); color:#fff; }
+body.midnight { background: linear-gradient(to bottom,#2c3e50,#000428); color:#fff; }
+body.candy    { background: linear-gradient(to bottom,#ff77aa,#ffb3cc); color:#fff; }
+body.pastel   { background: linear-gradient(to bottom,#a0e7e5,#fcd1d1); color:#333; }
+body.monochrome{ background: linear-gradient(to bottom,#eee,#555); color:#222; }
+body.retro    { background: linear-gradient(to bottom,#ff7f50,#ff6347); color:#fff; }
+body.sunset   { background: linear-gradient(to bottom,#ff7e5f,#feb47b); color:#fff; }
+body.jungle   { background: linear-gradient(to bottom,#29ab87,#00755e); color:#fff; }
+body.glass    { background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); color:#333; }
+
 
 /* --- Desktop-preview (samma färg på knappar i mobilen) --- */
 .mobile-preview.default  .link-button { background: #007bff;           color: #fff;   box-shadow: none; }
@@ -393,13 +404,23 @@ body.rainbow { background: linear-gradient(90deg,red,orange,yellow,green,blue,in
 .mobile-preview.dark     .link-button { background: #1c1c1c;          color: #f9f9f9; box-shadow: none; }
 .mobile-preview.neon     .link-button { background: none;             border: 2px solid #0ff;  color: #0ff;    box-shadow: none; }
 .mobile-preview.sun      .link-button { background: #f9c667;          color: #333;   box-shadow: none; }
-.mobile-preview.graffiti .link-button { background: rgba(255,255,255,0.2); color: #fff; box-shadow: none; }
 .mobile-preview.rainbow  .link-button {
   background: none;
   background-image: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet);
   color: #fff;
   box-shadow: none;
 }
+
+.mobile-preview.ocean    .link-button { background: #0077cc; color: #fff; box-shadow: none; }
+.mobile-preview.forest   .link-button { background: #228b22; color: #fff; box-shadow: none; }
+.mobile-preview.midnight .link-button { background: #1a2a6c; color: #fff; box-shadow: none; }
+.mobile-preview.candy    .link-button { background: #ff69b4; color: #fff; box-shadow: none; }
+.mobile-preview.pastel   .link-button { background: #ffbebe; color: #333; box-shadow: none; }
+.mobile-preview.monochrome .link-button { background: #333; color: #fff; box-shadow: none; }
+.mobile-preview.retro    .link-button { background: #ffa500; color: #fff; box-shadow: none; }
+.mobile-preview.sunset   .link-button { background: #ff4500; color: #fff; box-shadow: none; }
+.mobile-preview.jungle   .link-button { background: #3b7045; color: #fff; box-shadow: none; }
+.mobile-preview.glass    .link-button { background: rgba(255,255,255,0.4); color: #333; box-shadow: none; }
 
 /* ==========================================================================
    14. Public-profile (specialutseende)

@@ -60,16 +60,7 @@
   color: #fff;
 }
 
-/* Graffiti */
-.mobile-preview.graffiti {
-  background: url('/static/graffiti-bg.jpg') center/cover no-repeat;
-  color: white;
-}
-.link-button.graffiti,
-.action-btn.graffiti {
-  background-color: rgba(0,0,0,0.7);
-  color: #fff;
-}
+
 
 /* Rainbow */
 .mobile-preview.rainbow {
@@ -115,12 +106,151 @@
   background: linear-gradient(135deg, #fefcea, #f1da36);
   color: #333;
 }
-.template-card.graffiti .preview {
-  background: url('/static/graffiti-bg.jpg') center/cover no-repeat;
-  color: white;
-}
+
 .template-card.rainbow .preview {
   background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
   color: white;
   font-weight: bold;
+}
+
+/* ===== Premium Templates ===== */
+.mobile-preview.ocean {
+  background: linear-gradient(135deg, #00aaff, #004477);
+  color: #fff;
+}
+.link-button.ocean,
+.action-btn.ocean {
+  background-color: #0077cc;
+  color: #fff;
+}
+.template-card.ocean .preview {
+  background: #0077cc;
+  color: #fff;
+}
+
+.mobile-preview.forest {
+  background: linear-gradient(135deg, #2e8b57, #013220);
+  color: #fff;
+}
+.link-button.forest,
+.action-btn.forest {
+  background-color: #228b22;
+  color: #fff;
+}
+.template-card.forest .preview {
+  background: #228b22;
+  color: #fff;
+}
+
+.mobile-preview.midnight {
+  background: linear-gradient(135deg, #2c3e50, #000428);
+  color: #fff;
+}
+.link-button.midnight,
+.action-btn.midnight {
+  background-color: #1a2a6c;
+  color: #fff;
+}
+.template-card.midnight .preview {
+  background: #1a2a6c;
+  color: #fff;
+}
+
+.mobile-preview.candy {
+  background: linear-gradient(135deg, #ff77aa, #ffb3cc);
+  color: #fff;
+}
+.link-button.candy,
+.action-btn.candy {
+  background-color: #ff69b4;
+  color: #fff;
+}
+.template-card.candy .preview {
+  background: #ff69b4;
+  color: #fff;
+}
+
+.mobile-preview.pastel {
+  background: linear-gradient(135deg, #a0e7e5, #fcd1d1);
+  color: #333;
+}
+.link-button.pastel,
+.action-btn.pastel {
+  background-color: #ffbebe;
+  color: #333;
+}
+.template-card.pastel .preview {
+  background: #ffbebe;
+  color: #333;
+}
+
+.mobile-preview.monochrome {
+  background: linear-gradient(135deg, #eee, #555);
+  color: #222;
+}
+.link-button.monochrome,
+.action-btn.monochrome {
+  background-color: #333;
+  color: #fff;
+}
+.template-card.monochrome .preview {
+  background: #333;
+  color: #fff;
+}
+
+.mobile-preview.retro {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: #fff;
+}
+.link-button.retro,
+.action-btn.retro {
+  background-color: #ffa500;
+  color: #fff;
+}
+.template-card.retro .preview {
+  background: #ffa500;
+  color: #fff;
+}
+
+.mobile-preview.sunset {
+  background: linear-gradient(135deg, #ff7e5f, #feb47b);
+  color: #fff;
+}
+.link-button.sunset,
+.action-btn.sunset {
+  background-color: #ff4500;
+  color: #fff;
+}
+.template-card.sunset .preview {
+  background: #ff4500;
+  color: #fff;
+}
+
+.mobile-preview.jungle {
+  background: linear-gradient(135deg, #29ab87, #00755e);
+  color: #fff;
+}
+.link-button.jungle,
+.action-btn.jungle {
+  background-color: #3b7045;
+  color: #fff;
+}
+.template-card.jungle .preview {
+  background: #3b7045;
+  color: #fff;
+}
+
+.mobile-preview.glass {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+  color: #333;
+}
+.link-button.glass,
+.action-btn.glass {
+  background-color: rgba(255,255,255,0.4);
+  color: #333;
+}
+.template-card.glass .preview {
+  background: rgba(255,255,255,0.4);
+  color: #333;
 }

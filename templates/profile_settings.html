@@ -68,7 +68,14 @@
       </div>
 
       <div class="template-slider" id="template-slider">
-        {% for name in ['default','elegant','dark','neon','sun','graffiti','rainbow'] %}
+        {% set base_templates = ['default','elegant','dark','neon','sun','rainbow'] %}
+        {% set premium_templates = ['ocean','forest','midnight','candy','pastel','monochrome','retro','sunset','jungle','glass'] %}
+        {% if user.is_premium %}
+          {% set templates = base_templates + premium_templates %}
+        {% else %}
+          {% set templates = base_templates %}
+        {% endif %}
+        {% for name in templates %}
         <label class="template-card {{ name }}" data-name="{{ name }}">
           <input type="radio" name="template" value="{{ name }}"
                  {% if user.template == name %}checked{% endif %}>
