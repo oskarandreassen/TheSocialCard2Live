@@ -133,8 +133,8 @@ def export_csv():
 @admin_bp.route('/run-purge', methods=['POST'])
 @admin_required
 def run_purge():
-    purge_unconfirmed()
-    flash('Rensning genomförd', 'success')
+    count = purge_unconfirmed(include_recent=True)
+    flash(f'Raderade {count} obekräftade konton', 'success')
     return redirect(url_for('admin.index'))
 
 
