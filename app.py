@@ -15,7 +15,8 @@ from flask_mail import Mail, Message
 from flask import Flask
 from flask_mail import Mail
 
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from billing import billing
 
@@ -39,6 +40,9 @@ app = Flask(
     template_folder='templates',
     static_folder='static'
 )
+
+
+
 
 mail = Mail(app)
 
@@ -64,6 +68,13 @@ exempt = {'auth.login', 'auth.register', 'auth.confirm_email',
           'auth.resend_confirm', 'auth.setup_email', 'public.public_profile', 'static',
           'uploaded_file'
           }
+
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[],
+)
+limiter.init_app(app)
+
 
 from admin import admin_bp
 app.register_blueprint(admin_bp)

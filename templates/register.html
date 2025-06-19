@@ -4,6 +4,7 @@
   <h2>Registrera konto</h2>
   <form method="post">
     {{ form.hidden_tag() }}
+
     <p>
       {{ form.username.label }}<br>
       {{ form.username(class="form-input") }}<br>
@@ -11,6 +12,7 @@
         <span class="error">{{ err }}</span><br>
       {% endfor %}
     </p>
+
     <p>
       {{ form.email.label }}<br>
       {{ form.email(class="form-input") }}<br>
@@ -18,6 +20,7 @@
         <span class="error">{{ err }}</span><br>
       {% endfor %}
     </p>
+
     <p>
       {{ form.password.label }}<br>
       {{ form.password(class="form-input") }}<br>
@@ -25,6 +28,7 @@
         <span class="error">{{ err }}</span><br>
       {% endfor %}
     </p>
+
     <p>
       {{ form.password2.label }}<br>
       {{ form.password2(class="form-input") }}<br>
@@ -32,7 +36,18 @@
         <span class="error">{{ err }}</span><br>
       {% endfor %}
     </p>
+
+    {# Honeypotfält (osynligt för riktiga användare) #}
+    <div style="display:none;">
+      {{ form.honeypot.label }}
+      {{ form.honeypot() }}
+      {% for err in form.honeypot.errors %}
+        <span class="error">{{ err }}</span><br>
+      {% endfor %}
+    </div>
+
     <p>{{ form.submit(class="btn-primary") }}</p>
   </form>
+
   <p>Har du redan ett konto? <a href="{{ url_for('auth.login') }}">Logga in</a></p>
 {% endblock %}

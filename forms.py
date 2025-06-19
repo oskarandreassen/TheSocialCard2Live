@@ -8,8 +8,12 @@ from wtforms.validators import (
 from models import User
 from disposable_email_domains import blocklist as disposable_domains
 
+from wtforms import HiddenField
+from wtforms.validators import Length
+
 
 class RegisterForm(FlaskForm):
+    honeypot = HiddenField('', validators=[Length(max=0)])
     username = StringField(
         'Användarnamn',
         validators=[DataRequired(), Length(min=3, max=150)]
@@ -31,6 +35,10 @@ class RegisterForm(FlaskForm):
         validators=[DataRequired()]
     )
     submit = SubmitField('Registrera')
+
+    def validate_honeypot(self, field):
+        if field.data:
+            raise ValidationError('Bot upptäckt!')
 
     def validate_username(self, field):
         if User.query.filter_by(username=field.data).first():

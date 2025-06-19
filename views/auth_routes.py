@@ -1,20 +1,16 @@
 # views/auth_routes.py
-from flask import session
-from app import mail
-from flask import Blueprint, render_template, redirect, url_for, flash
-from flask_login import login_user, logout_user
+
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session
+from flask_login import login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User
-from flask_mail import Message
-from datetime import datetime        # ← Lägg till den här raden
+from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 
-from flask import session, Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, current_user
+from app import mail, db, limiter        # ← Importera limiter här
+from models import User
 from forms import RegisterForm, LoginForm, SetupEmailForm
-
-
+from flask_mail import Message
 
 
 auth = Blueprint('auth', __name__)
@@ -23,7 +19,9 @@ auth = Blueprint('auth', __name__)
 def home():
     return redirect(url_for('auth.login'))
 
-@auth.route('/register', methods=['GET','POST'])
+
+@auth.route('/register', methods=['GET', 'POST'])
+@limiter.limit("5 per hour")  # max 5 försök per IP och timme
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
