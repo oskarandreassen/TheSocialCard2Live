@@ -48,7 +48,7 @@ mail = Mail(app)
 
 # app.py (viktigast: längst ner eller där du registrerar andra blueprints)
 from billing import billing
-app.register_blueprint(billing)  # prefix är redan satt i billing.py som '/billing'
+app.register_blueprint(billing, url_prefix='/billing')  # prefix är redan satt i billing.py som '/billing'
 
 
 # … efter app = Flask(…)
@@ -203,26 +203,7 @@ if not run_migrations:
 
 
 
-from flask import request, abort
 
-@app.route('/webhook', methods=['POST'])
-def stripe_webhook():
-    payload    = request.data
-    sig_header = request.headers.get('Stripe-Signature')
-    secret     = os.environ['STRIPE_WEBHOOK_SECRET']
-    try:
-        event = stripe.Webhook.construct_event(payload, sig_header, secret)
-    except stripe.error.SignatureVerificationError:
-        abort(400)
-
-    if event['type'] == 'checkout.session.completed':
-        sess = event['data']['object']
-        user = User.query.filter_by(stripe_customer_id=sess['customer']).first()
-        if user:
-            user.is_premium             = True
-            user.stripe_subscription_id = sess.get('subscription')
-            db.session.commit()
-    return '', 200
 
 
 # ── Run server ────────────────────────────────────────────────────────
