@@ -1,4 +1,6 @@
 # ignorerar SQLite-filen
 instance/users.db
 .env
+__pycache__/
+.venv/
 
