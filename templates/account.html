@@ -7,8 +7,69 @@
     <input type="checkbox" name="email_notifications" {% if user.email_notifications %}checked{% endif %}>
     Få e-postutskick
   </label><br><br>
-  <label>Byt lösenord:</label><br>
-  <input type="password" name="new_password" placeholder="Nytt lösenord">
+
+  <label>E-post:</label><br>
+  <input type="email" name="email" value="{{ user.email or '' }}" placeholder="E-postadress"><br>
+  <label>
+    <input type="checkbox" name="show_email" {% if user.show_email %}checked{% endif %}>
+    Visa e-post offentligt
+  </label><br><br>
+
+  <label>Telefonnummer:</label><br>
+  <input type="tel" name="phone_number" value="{{ user.phone_number or '' }}" placeholder="Telefonnummer"><br>
+  <label>
+    <input type="checkbox" name="show_phone" {% if user.show_phone %}checked{% endif %}>
+    Visa telefon offentligt
+  </label><br><br>
+
+  <label>Nuvarande lösenord:</label><br>
+  <input type="password" name="current_password" placeholder="Nuvarande lösenord"><br>
+  <label>Nytt lösenord:</label><br>
+  <input type="password" name="new_password" placeholder="Nytt lösenord"><br>
+  <label>Bekräfta nytt lösenord:</label><br>
+  <input type="password" name="confirm_password" placeholder="Bekräfta nytt lösenord"><br><br>
+
   <button type="submit">Spara</button>
+</form>
+
+<h3>Medlemskap</h3>
+{% if user.is_premium %}
+  <p>Du är premium-medlem.</p>
+  <button id="manage-membership" type="button">Hantera medlemskap </button>
+  <div id="portal-container"></div>
+{% else %}
+  <p>Du har inget aktivt premium.</p>
+  <a href="{{ url_for('billing.checkout_page') }}">Uppgradera till Premium</a>
+{% endif %}
+
+<script src="https://js.stripe.com/v3/billing-portal.js" async></script>
+<script>
+  const btn = document.getElementById('manage-membership');
+  if (btn) {
+    btn.addEventListener('click', async () => {
+      const res = await fetch('{{ url_for('billing.create_portal_session') }}', {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (data.client_secret) {
+        const portal = Stripe('{{ stripe_public_key }}').initEmbeddedBillingPortal({
+          clientSecret: data.client_secret
+        });
+        portal.mount('#portal-container');
+      } else if (data.url) {
+        const iframe = document.createElement('iframe');
+        iframe.src = data.url;
+        iframe.style.width = '100%';
+        iframe.style.height = '600px';
+        iframe.style.border = 'none';
+        document.getElementById('portal-container').appendChild(iframe);
+      }
+    });
+  }
+</script>
+
+<h3>Radera konto</h3>
+<form method="POST" action="{{ url_for('dashboard.delete_account') }}" onsubmit="return confirm('Är du säker? Detta går inte att ångra!');">
+  <button type="submit" style="color:red;">Radera konto</button>
 </form>
 {% endblock %}

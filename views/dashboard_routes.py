@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash, current_app
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 from models import db, Link
 from forms import ProfileForm
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 dashboard = Blueprint('dashboard', __name__)
 
@@ -148,12 +148,38 @@ def account_settings():
     if request.method == 'POST':
         notif = request.form.get('email_notifications') == 'on'
         current_user.email_notifications = notif
-        password = request.form.get('new_password')
-        if password:
-            current_user.password = generate_password_hash(password)
+        current_user.email = request.form.get('email') or current_user.email
+        current_user.show_email = request.form.get('show_email') == 'on'
+        current_user.phone_number = request.form.get('phone_number') or current_user.phone_number
+        current_user.show_phone = request.form.get('show_phone') == 'on'
+        current_pw = request.form.get('current_password')
+        new_pw = request.form.get('new_password')
+        confirm_pw = request.form.get('confirm_password')
+
+        if new_pw or confirm_pw or current_pw:
+            if not (current_pw and new_pw and confirm_pw):
+                flash('Fyll i samtliga lösenordsfält.', 'danger')
+                return redirect(url_for('dashboard.account_settings'))
+            if not check_password_hash(current_user.password, current_pw):
+                flash('Nuvarande lösenord är fel.', 'danger')
+                return redirect(url_for('dashboard.account_settings'))
+            if new_pw != confirm_pw:
+                flash('Det nya lösenordet matchar inte bekräftelsen.', 'danger')
+                return redirect(url_for('dashboard.account_settings'))
+            current_user.password = generate_password_hash(new_pw)
         db.session.commit()
         flash('Kontot uppdaterat', 'success')
         return redirect(url_for('dashboard.account_settings'))
 
     return render_template('account.html', user=current_user)
 
+
+@dashboard.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    user = current_user
+    logout_user()
+    db.session.delete(user)
+    db.session.commit()
+    flash('Ditt konto har raderats.', 'info')
+    return redirect(url_for('auth.login'))

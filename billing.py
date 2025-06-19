@@ -1,6 +1,6 @@
 import os
 import stripe
-from flask import Blueprint, render_template, request, jsonify, abort, url_for, current_app
+from flask import Blueprint, render_template, request, jsonify, abort, url_for, current_app, redirect
 from flask_login import login_required, current_user
 from models import db, User, Link
 from flask_mail import Message
@@ -102,6 +102,20 @@ def checkout_cancel():
     return render_template('billing/cancel.html')
 
 
+@billing.route('/customer-portal')
+@login_required
+def customer_portal():
+    if not current_user.stripe_customer_id:
+        abort(404)
+    session = stripe.billing_portal.Session.create(
+        customer=current_user.stripe_customer_id,
+        return_url=url_for('dashboard.account_settings', _external=True)
+    )
+    return redirect(session.url)
+
+
+
+
 #
 # ── 4) Stripe Webhook: checkout.session.completed ────────────────────────
 #
@@ -169,3 +183,25 @@ Team SocialCard
             print("[Webhook] session metadata saknar user_id")
 
     return '', 200
+
+
+@billing.route('/create-portal-session', methods=['POST'])
+@login_required
+def create_portal_session():
+    """Create a Stripe Customer Portal session for the logged in user."""
+    if not current_user.stripe_customer_id:
+        return jsonify({'error': 'no_customer'}), 400
+
+    try:
+        portal_session = stripe.billing_portal.Session.create(
+            customer=current_user.stripe_customer_id,
+            return_url=url_for('dashboard.account_settings', _external=True)
+        )
+
+        client_secret = getattr(portal_session, 'client_secret', None)
+        if client_secret:
+            return jsonify({'client_secret': client_secret})
+
+        return jsonify({'url': portal_session.url})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
