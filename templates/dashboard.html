@@ -7,6 +7,9 @@
   <!-- 🎛️ DASHBOARD PANEL I MITTEN -->
   <div class="dashboard-panel">
     <h2>Välkommen, {{ user.display_name or user.username }}!</h2>
+        {% if current_user.is_premium %}
+      <p>Besök på din profil: {{ user.page_views or 0 }}</p>
+    {% endif %}
 
     {# ——— Mobil‐förhandsvisning ——— #}
     <div class="mobile-only">
@@ -190,6 +193,11 @@
                   {% if link.is_visible %}👁️{% else %}❌{% endif %}
                 </button>
               </form>
+                            {% if current_user.is_premium %}
+                <span class="link-btn" title="Antal klick">
+                  <i class="fas fa-eye"></i> {{ link.click_count or 0 }}
+                </span>
+              {% endif %}
               <a href="#" class="link-btn edit-btn" title="Redigera">✏️</a>
               <a href="{{ url_for('dashboard.delete_link', link_id=link.id) }}"
                  class="link-btn" title="Radera">🗑️</a>

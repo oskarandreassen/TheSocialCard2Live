@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Konto{% endblock %}
+{% block content %}
+<h2>Kontoinställningar</h2>
+<form method="POST">
+  <label>
+    <input type="checkbox" name="email_notifications" {% if user.email_notifications %}checked{% endif %}>
+    Få e-postutskick
+  </label><br><br>
+  <label>Byt lösenord:</label><br>
+  <input type="password" name="new_password" placeholder="Nytt lösenord">
+  <button type="submit">Spara</button>
+</form>
+{% endblock %}

@@ -1,13 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash, current_app
 from flask_login import login_required, current_user
 from models import db, Link
 from forms import ProfileForm
-from flask import flash
-
-from flask import current_app, render_template
-from flask_login import login_required, current_user
-from models import Link
-
+from werkzeug.security import generate_password_hash
 
 dashboard = Blueprint('dashboard', __name__)
 
@@ -146,4 +141,19 @@ def set_main_public_link(link_id):
     db.session.commit()
     return ('', 204)
 
+
+@dashboard.route('/account', methods=['GET', 'POST'])
+@login_required
+def account_settings():
+    if request.method == 'POST':
+        notif = request.form.get('email_notifications') == 'on'
+        current_user.email_notifications = notif
+        password = request.form.get('new_password')
+        if password:
+            current_user.password = generate_password_hash(password)
+        db.session.commit()
+        flash('Kontot uppdaterat', 'success')
+        return redirect(url_for('dashboard.account_settings'))
+
+    return render_template('account.html', user=current_user)
 

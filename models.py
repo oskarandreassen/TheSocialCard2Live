@@ -26,11 +26,14 @@ class User(db.Model, UserMixin):
 
     show_links       = db.Column(db.Boolean, default=True)
     is_visible       = db.Column(db.Boolean, default=True)
+    page_views       = db.Column(db.Integer, default=0)
+
 
     email            = db.Column(db.String(120), unique=True, nullable=False)
     show_email       = db.Column(db.Boolean, default=False)
     phone_number     = db.Column(db.String(20), nullable=True)
     show_phone       = db.Column(db.Boolean, default=False)
+    email_notifications = db.Column(db.Boolean, default=True)
 
     email_confirmed  = db.Column(db.Boolean, default=False)
     email_token      = db.Column(db.String(36), nullable=True)
@@ -71,3 +74,5 @@ class Link(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     position = db.Column(db.Integer, default=0)
     is_visible = db.Column(db.Boolean, default=True)
+    click_count = db.Column(db.Integer, default=0)
+

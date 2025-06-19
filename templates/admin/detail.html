@@ -69,6 +69,10 @@
         {% endif %}
       </td>
     </tr>
+    <tr>
+      <th>Sidvisningar:</th>
+      <td>{{ user.page_views or 0 }}</td>
+    </tr>
   </table>
 
   <form method="post" class="user-actions-form">
@@ -88,7 +92,10 @@
   <h3>Användarens länkar</h3>
   <ul>
     {% for link in user.links %}
-      <li><a href="{{ link.url }}">{{ link.label }}</a></li>
+      <li>
+        <a href="{{ link.url }}">{{ link.label }}</a>
+        ({{ link.click_count or 0 }} klick)
+      </li>
     {% endfor %}
   </ul>
 </div>

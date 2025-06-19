@@ -19,7 +19,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 30px 16px 140px;
+  padding: 30px 16px 200px;
   box-sizing: border-box;
 }
 /* Kortet med profil + länkar */
@@ -150,7 +150,7 @@ body {
         {% elif "skype.com"      in link.url %}{% set icon = "fab fa-skype"        %}
         {% elif "mastodon"       in link.url %}{% set icon = "fab fa-mastodon"     %}
         {% endif %}
-        <a class="link-button {{ user.template }}" href="{{ link.url }}" target="_blank">
+        <a class="link-button {{ user.template }}" href="{{ url_for('public.redirect_link', link_id=link.id) }}" target="_blank">
           {% if icon %}<i class="{{ icon }}"></i>{% endif %}
           {{ link.label }}
         </a>

@@ -36,6 +36,7 @@
             Offentlig profil
           </a>
         </li>
+        <li><a class="btn-secondary" href="{{ url_for('dashboard.account_settings') }}">Konto</a></li>
         <li><a class="btn-secondary" href="{{ url_for('auth.logout') }}">Logga ut</a></li>
       {% else %}
         <li><a class="btn-secondary" href="{{ url_for('auth.login') }}">Logga in</a></li>
